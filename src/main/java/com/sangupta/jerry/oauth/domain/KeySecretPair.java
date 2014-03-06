@@ -25,12 +25,12 @@ import java.util.UUID;
 
 /**
  * Value object to store a key-value pair that together make
- * up an {@link OAuthToken}. The object is immutable.
+ * up an {@link KeySecretPair}. The object is immutable.
  * 
  * @author sangupta
  *
  */
-public class OAuthToken {
+public class KeySecretPair {
 
 	/**
 	 * Holds the token key
@@ -49,19 +49,19 @@ public class OAuthToken {
 	 * @param key
 	 * @param secret
 	 */
-	public OAuthToken(String key, String secret) {
+	public KeySecretPair(String key, String secret) {
 		this.key = key;
 		this.secret = secret;
 	}
 	
 	/**
-	 * Utility method to generate a new {@link OAuthToken} using {@link UUID}
+	 * Utility method to generate a new {@link KeySecretPair} using {@link UUID}
 	 * values as both key and secret.
 	 * 
 	 * @return
 	 */
-	public static OAuthToken uuidRandomToken() {
-		return new OAuthToken(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+	public static KeySecretPair uuidRandomToken() {
+		return new KeySecretPair(UUID.randomUUID().toString(), UUID.randomUUID().toString());
 	}
 	
 	// Usual accessors follow
