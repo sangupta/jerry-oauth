@@ -21,10 +21,108 @@
 
 package com.sangupta.jerry.oauth.domain;
 
+import com.sangupta.jerry.http.WebRequestMethod;
+
 /**
  * @author sangupta
  *
  */
 public class OAuthConfig {
+	
+	/**
+	 * The API client ID and secret to be used
+	 */
+	private final KeySecretPair apiKeySecretPair;
+	
+	/**
+	 * The scope value to be used
+	 */
+	private String scope;
+	
+	/**
+	 * The callback URL to be used
+	 */
+	private String callbackURL;
+	
+	/**
+	 * The webrequest methods to use
+	 */
+	private final WebRequestMethod webRequestMethod;
+	
+	/**
+	 * The signature method to be used by the client
+	 */
+	private final OAuthSignatureMethod signatureMethod;
+	
+	/**
+	 * 
+	 * @param keySecretPair
+	 */
+	public OAuthConfig(KeySecretPair keySecretPair) {
+		this(keySecretPair, WebRequestMethod.GET, OAuthSignatureMethod.HMAC_SHA1);
+	}
+	
+	/**
+	 * 
+	 * @param keySecretPair
+	 * @param method
+	 * @param signatureMethod
+	 */
+	public OAuthConfig(KeySecretPair keySecretPair, WebRequestMethod method, OAuthSignatureMethod signatureMethod) {
+		this.apiKeySecretPair = keySecretPair;
+		this.webRequestMethod = method;
+		this.signatureMethod = signatureMethod;
+	}
+	
+	// Usual accessors follow
+
+	/**
+	 * @return the signatureMethod
+	 */
+	public OAuthSignatureMethod getSignatureMethod() {
+		return signatureMethod;
+	}
+
+	/**
+	 * @return the apiKeySecretPair
+	 */
+	public KeySecretPair getApiKeySecretPair() {
+		return apiKeySecretPair;
+	}
+
+	/**
+	 * @return the scope
+	 */
+	public String getScope() {
+		return scope;
+	}
+
+	/**
+	 * @param scope the scope to set
+	 */
+	public void setScope(String scope) {
+		this.scope = scope;
+	}
+
+	/**
+	 * @return the callbackURL
+	 */
+	public String getCallbackURL() {
+		return callbackURL;
+	}
+
+	/**
+	 * @param callbackURL the callbackURL to set
+	 */
+	public void setCallbackURL(String callbackURL) {
+		this.callbackURL = callbackURL;
+	}
+
+	/**
+	 * @return the webRequestMethod
+	 */
+	public WebRequestMethod getWebRequestMethod() {
+		return webRequestMethod;
+	}
 
 }

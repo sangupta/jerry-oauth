@@ -43,6 +43,12 @@ public interface OAuthConstants {
 	
 	public static final String OAUTH_VERSION = "oauth_version";
 	
+	public static final String OAUTH_VERSION_1_0 = "1.0";
+	
+	public static final String OAUTH_AUTHORIZATION_HEADER_NAME = "OAuth";
+	
+	// XAuth
+	
 	public static final String X_AUTH_MODE = "x_auth_mode";
 	
 	public static final String X_AUTH_USERNAME = "x_auth_username";
@@ -50,9 +56,19 @@ public interface OAuthConstants {
 	public static final String X_AUTH_PASSWORD = "x_auth_password";
 	
 	public static final String DEFAULT_XAUTH_MODE = "client_auth";
+
+	// OAuth 2.0
 	
-	public static final String OAUTH_VERSION_1_0 = "1.0";
+	public static final String OAUTH_VERSION_2_0 = "1.0";
+
+	public static final String OAUTH_ACCESS_TOKEN = "access_token";
+
+	public static final String OAUTH_CLIENT_ID = "client_id";
 	
-	public static final String OAUTH_AUTHORIZATION_HEADER_NAME = "OAuth";
-	
+	public static final String OAUTH_CLIENT_SECRET = "client_secret";
+
+	public static final String OAUTH_REDIRECT_URI = "redirect_uri";
+
+	public static final String OAUTH_CODE = "code";
+
 }
