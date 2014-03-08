@@ -70,5 +70,7 @@ public interface OAuthConstants {
 	public static final String OAUTH_REDIRECT_URI = "redirect_uri";
 
 	public static final String OAUTH_CODE = "code";
+	
+	public static final String OAUTH_SCOPE = "scope";
 
 }
