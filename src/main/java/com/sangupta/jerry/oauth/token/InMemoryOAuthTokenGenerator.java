@@ -27,7 +27,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.sangupta.jerry.oauth.domain.OAuthToken;
+import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.jerry.util.DateUtils;
 
@@ -97,13 +97,13 @@ public class InMemoryOAuthTokenGenerator implements OAuthTokenGenerator {
 	 * @see com.sangupta.jerry.oauth.token.OAuthTokenGenerator#generateKeyPair(java.lang.String)
 	 */
 	@Override
-	public OAuthToken generateKeyPair(String consumerKey) {
+	public KeySecretPair generateKeyPair(String consumerKey) {
 		if(AssertUtils.isEmpty(consumerKey)) {
 			throw new IllegalArgumentException("Consumer key cannot be null/empty");
 		}
 		
 		do {
-			OAuthToken token = OAuthToken.uuidRandomToken();
+			KeySecretPair token = KeySecretPair.uuidRandomToken();
 			OAuthTokenWrapper olderToken = TOKEN_TO_KEY_MAP.putIfAbsent(token.getKey(), new OAuthTokenWrapper(token, consumerKey));
 			if(olderToken == null) {
 				return token;
@@ -175,13 +175,13 @@ public class InMemoryOAuthTokenGenerator implements OAuthTokenGenerator {
      */
 	private static class OAuthTokenWrapper {
 		
-		OAuthToken token;
+		KeySecretPair token;
 		
 		String consumerKey;
 		
 		long millis;
 		
-		public OAuthTokenWrapper(OAuthToken token, String consumerKey) {
+		public OAuthTokenWrapper(KeySecretPair token, String consumerKey) {
 			this.token = token;
 			this.consumerKey = consumerKey;
 			this.millis = System.currentTimeMillis();

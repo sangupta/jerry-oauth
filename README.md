@@ -18,6 +18,7 @@ Releases
 * In-memory implementation for nonce verifier
 * In-memory implementation for oauth token generator
 * Utility methods to generate OAuth headers when making requests
+* Utility client to send OAuth signed requests
 
 Downloads
 ---------

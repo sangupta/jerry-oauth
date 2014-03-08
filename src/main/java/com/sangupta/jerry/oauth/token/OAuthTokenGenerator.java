@@ -21,7 +21,7 @@
 
 package com.sangupta.jerry.oauth.token;
 
-import com.sangupta.jerry.oauth.domain.OAuthToken;
+import com.sangupta.jerry.oauth.domain.KeySecretPair;
 
 /**
  * Contract for implementations that wish to generate OAuth tokens
@@ -39,7 +39,7 @@ public interface OAuthTokenGenerator {
 	 * @param consumerKey
 	 * @return
 	 */
-	public OAuthToken generateKeyPair(String consumerKey);
+	public KeySecretPair generateKeyPair(String consumerKey);
 	
 	/**
 	 * Return the token secret for the given consumer key and access token.

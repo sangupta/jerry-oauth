@@ -45,7 +45,7 @@ import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureMethod;
-import com.sangupta.jerry.oauth.domain.OAuthToken;
+import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.jerry.util.StringUtils;
 import com.sangupta.jerry.util.UriUtils;
@@ -58,7 +58,7 @@ import com.sangupta.jerry.util.UriUtils;
  */
 public class OAuthUtils {
 	
-	public static WebRequest signRequest(WebRequest request, OAuthToken consumer, OAuthToken userToken, String timeStamp, String nonce) {
+	public static WebRequest signRequest(WebRequest request, KeySecretPair consumer, KeySecretPair userToken, String timeStamp, String nonce) {
 		StringBuilder builder = new StringBuilder();
 		
 		// first the HTTP VERB
@@ -368,7 +368,7 @@ public class OAuthUtils {
 	 * @param signingMethod
 	 * @return
 	 */
-	public static String generateSignature(OAuthToken consumer, OAuthToken userToken, String signable, OAuthSignatureMethod signingMethod) {
+	public static String generateSignature(KeySecretPair consumer, KeySecretPair userToken, String signable, OAuthSignatureMethod signingMethod) {
 		return generateSignature(consumer.getSecret(), userToken.getSecret(), signable, signingMethod);
 	}
 

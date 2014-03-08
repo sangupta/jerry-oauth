@@ -27,7 +27,7 @@ import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureMethod;
-import com.sangupta.jerry.oauth.domain.OAuthToken;
+import com.sangupta.jerry.oauth.domain.KeySecretPair;
 
 /**
  * @author sangupta
@@ -35,7 +35,7 @@ import com.sangupta.jerry.oauth.domain.OAuthToken;
  */
 public class OAuthClient {
 
-	private OAuthToken consumer;
+	private KeySecretPair consumer;
 	
 	private OAuthSignatureMethod signatureMethod;
 	
@@ -53,15 +53,15 @@ public class OAuthClient {
 	 * @param secret
 	 */
 	public OAuthClient(String key, String secret) {
-		this(new OAuthToken(key, secret));
+		this(new KeySecretPair(key, secret));
 	}
 	
 	/**
-	 * Generate a new instance of {@link OAuthClient} for the given {@link OAuthToken}.
+	 * Generate a new instance of {@link OAuthClient} for the given {@link KeySecretPair}.
 	 * 
 	 * @param consumer
 	 */
-	public OAuthClient(OAuthToken consumer) {
+	public OAuthClient(KeySecretPair consumer) {
 		this(consumer, OAuthSignatureMethod.HMAC_SHA1, OAuthConstants.OAUTH_VERSION_1_0, OAuthConstants.OAUTH_AUTHORIZATION_HEADER_NAME, false);
 	}
 
@@ -73,7 +73,7 @@ public class OAuthClient {
 	 * @param authorizationHeader
 	 * @param includeOAuthParamsInBody
 	 */
-	public OAuthClient(OAuthToken consumer, OAuthSignatureMethod signatureMethod, String oauthVersion, String authorizationHeader, boolean includeOAuthParamsInBody) {
+	public OAuthClient(KeySecretPair consumer, OAuthSignatureMethod signatureMethod, String oauthVersion, String authorizationHeader, boolean includeOAuthParamsInBody) {
 		this.consumer = consumer;
 		this.signatureMethod = signatureMethod;
 		this.oAuthVersion = oauthVersion;
