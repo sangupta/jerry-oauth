@@ -32,14 +32,14 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 		return um.constructURL();
 	}
 	
-	public String getAuthorizationResponse(String code) {
+	public String getAuthorizationResponse(String code, String redirectURL) {
 		WebRequest request = WebInvoker.getWebRequest(getAuthorizationEndPoint(), getAuthorizationMethod());
-		request.bodyForm(WebForm.newForm().addParam("code", code)
-										  .addParam("client_id", this.keySecretPair.getKey())
-										  .addParam("client_secret", this.keySecretPair.getSecret())
-										  .addParam("grant_type", "authorization_code")
-										  .addParam("redirect_uri", "https://www.multiplx.com/oauth2callback")
-										  .build());
+		WebForm webForm = WebForm.newForm().addParam("code", code)
+				  .addParam("client_id", this.keySecretPair.getKey())
+				  .addParam("client_secret", this.keySecretPair.getSecret())
+				  .addParam("redirect_uri", redirectURL);
+		massageAuthorizationURL(webForm);
+		request.bodyForm(webForm.build());
 		
 		WebResponse response = WebInvoker.executeSilently(request);
 		if(response == null || !response.isSuccess()) {
@@ -59,5 +59,7 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 	protected abstract WebRequestMethod getAuthorizationMethod();
 	
 	protected abstract void massageLoginURL(UrlManipulator manipulator);
+	
+	protected abstract void massageAuthorizationURL(WebForm webForm);
 
 }
