@@ -21,6 +21,8 @@
 
 package com.sangupta.jerry.oauth.service;
 
+import org.apache.http.NameValuePair;
+
 import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebInvoker;
 import com.sangupta.jerry.http.WebRequest;
@@ -59,13 +61,26 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 	}
 	
 	public String getAuthorizationResponse(String code, String redirectURL) {
-		WebRequest request = WebInvoker.getWebRequest(getAuthorizationEndPoint(), getAuthorizationMethod());
+		WebRequest request;
+		
 		WebForm webForm = WebForm.newForm().addParam("code", code)
 				  .addParam("client_id", this.keySecretPair.getKey())
 				  .addParam("client_secret", this.keySecretPair.getSecret())
 				  .addParam("redirect_uri", redirectURL);
 		massageAuthorizationURL(webForm);
-		request.bodyForm(webForm.build());
+
+		if(getAuthorizationMethod() == WebRequestMethod.POST) {
+			request = WebInvoker.getWebRequest(getAuthorizationEndPoint(), getAuthorizationMethod());
+			request.bodyForm(webForm.build());
+		} else {
+			// this may be a GET request, add parameters to URL
+			UrlManipulator manipulator = new UrlManipulator(getAuthorizationEndPoint());
+			for(NameValuePair pair : webForm.build()) {
+				manipulator.setQueryParam(pair.getName(), pair.getValue());
+			}
+			
+			request = WebInvoker.getWebRequest(manipulator.constructURL(), getAuthorizationMethod());
+		}
 		
 		WebResponse response = WebInvoker.executeSilently(request);
 		if(response == null || !response.isSuccess()) {
