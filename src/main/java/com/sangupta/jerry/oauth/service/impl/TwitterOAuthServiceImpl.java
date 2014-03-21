@@ -21,8 +21,8 @@
 
 package com.sangupta.jerry.oauth.service.impl;
 
+import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebRequest;
-import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.service.OAuth1ServiceImpl;
 
@@ -44,14 +44,11 @@ public class TwitterOAuthServiceImpl extends OAuth1ServiceImpl {
 
 	@Override
 	protected String getRequestTokenURL() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	protected WebRequestMethod getRequestTokenMethod() {
-		// TODO Auto-generated method stub
-		return null;
+	protected void massageTokenRequestHeader(WebForm webForm, String successUrl, String scope) {
+		webForm.addParam("oauth_callback", successUrl);
 	}
-	
+
 }

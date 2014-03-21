@@ -22,8 +22,8 @@
 package com.sangupta.jerry.oauth.nonce;
 
 /**
- * A contract for any service that wants to work as a <b>Nonce</b>
- * verifying service for OAuth based requests.
+ * A contract for any service that wants to work as a <b>Nonce</b> verifying
+ * service for OAuth based requests.
  * 
  * @author sangupta
  * @since 1.0
@@ -32,12 +32,21 @@ public interface NonceVerifier {
 
 	/**
 	 * Check if this nonce has been used against the given consumer key.
-	 * Implementations may choose to ignore the consumer key and verify
-	 * nonce on a global level.
+	 * Implementations may choose to ignore the consumer key and verify nonce on
+	 * a global level.
+	 * 
+	 * The nonce presented if verified to be not present, is then added to the
+	 * list of presented nonce tokens so that any further verification of the
+	 * token is negated.
 	 * 
 	 * @param consumerKey
+	 *            the users application key to be used
+	 * 
 	 * @param nonce
-	 * @return
+	 *            the nonce token presented
+	 * 
+	 * @return <code>true</code> if the token has never been presented before
+	 *         within the given timeframe, <code>false</code> otherwise.
 	 */
 	public boolean verifyNonce(String consumerKey, String nonce);
 	

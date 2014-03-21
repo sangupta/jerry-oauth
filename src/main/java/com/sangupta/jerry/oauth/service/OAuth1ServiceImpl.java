@@ -21,10 +21,16 @@
 
 package com.sangupta.jerry.oauth.service;
 
+import com.sangupta.jerry.http.HttpHeaderName;
+import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebInvoker;
 import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.http.WebRequestMethod;
+import com.sangupta.jerry.oauth.OAuthUtils;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
+import com.sangupta.jerry.oauth.domain.OAuthConstants;
+import com.sangupta.jerry.oauth.domain.OAuthSignatureMethod;
+import com.sangupta.jerry.oauth.nonce.NonceUtils;
 
 /**
  * Base implementation for all clients that support the OAuth 1.0 specifications.
@@ -34,8 +40,17 @@ import com.sangupta.jerry.oauth.domain.KeySecretPair;
  */
 public abstract class OAuth1ServiceImpl implements OAuthService {
 	
+	/**
+	 * The app specific key secret pair to be used
+	 * 
+	 */
 	protected final KeySecretPair keySecretPair;
 	
+	/**
+	 * Default constructor.
+	 * 
+	 * @param applicationKeySecretPair
+	 */
 	protected OAuth1ServiceImpl(KeySecretPair applicationKeySecretPair) {
 		this.keySecretPair = applicationKeySecretPair;
 	}
@@ -53,9 +68,66 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	@Override
 	public final String getLoginURL(String successUrl, String scope) {
 		WebRequest request = WebInvoker.getWebRequest(getRequestTokenURL(), getRequestTokenMethod());
+		
+		WebForm webForm = WebForm.newForm().addParam(OAuthConstants.OAUTH_CONSUMER_KEY, this.keySecretPair.getKey())
+										   .addParam(OAuthConstants.OAUTH_NONCE, NonceUtils.getUUIDNonce())
+										   .addParam(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis()))
+										   .addParam(OAuthConstants.OAUTH_VERSION, getOAuthVersion())
+										   .addParam(OAuthConstants.OAUTH_SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
+		
+		// add custom parameters if they need to be added
+		massageTokenRequestHeader(webForm, successUrl, scope);
+		
+		// generate the signature for the request
+		String signature = OAuthUtils.signRequest(request, this.keySecretPair, null, getOAuthSignatureMethod(), webForm);
+		
+		// sign the request with the details
+		
+		// hit the request for request token
+		
 		return null;
 	}
 
+	/**
+	 * Massage the token request authorization header to include any custom
+	 * values that the implementation needs to pass.
+	 * 
+	 * @param webForm
+	 *            the {@link WebForm} representation of all values inside the
+	 *            header
+	 * 
+	 * @param successUrl
+	 *            the success url that will be used for returning the request
+	 * 
+	 * @param scope
+	 *            the scope for the request
+	 */
+	protected void massageTokenRequestHeader(WebForm webForm, String successUrl, String scope) {
+		
+	}
+
+	/**
+	 * The version number to be used in the OAuth header. The default value
+	 * is {@link OAuthConstants#OAUTH_VERSION_1_0}. Implementations may override
+	 * this value in case they need to pass something else.
+	 * 
+	 * @return
+	 */
+	protected String getOAuthVersion() {
+		return OAuthConstants.OAUTH_VERSION_1_0;
+	}
+	
+	/**
+	 * Return the OAuth signing method name that will be used. The default
+	 * value is {@link OAuthSignatureMethod#HMAC_SHA1}. Implementations may
+	 * override this value in case the signing method is different.
+	 * 
+	 * @return
+	 */
+	protected OAuthSignatureMethod getOAuthSignatureMethod() {
+		return OAuthSignatureMethod.HMAC_SHA1;
+	}
+	
 	/**
 	 * Obtain the end-point for obtaining the request token.
 	 * 
@@ -64,10 +136,24 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	protected abstract String getRequestTokenURL();
 
 	/**
-	 * Return the HTTP verb to be used when making the request-token request.
+	 * Return the HTTP verb to be used when making the request-token request. The
+	 * default value is {@link WebRequestMethod#POST}. Implementations can override
+	 * the value in case the HTTP verb to be used is different.
 	 * 
 	 * @return
 	 */
-	protected abstract WebRequestMethod getRequestTokenMethod();
+	protected WebRequestMethod getRequestTokenMethod() {
+		return WebRequestMethod.POST;
+	}
 	
+	/**
+	 * Return the header name to be used when sending the OAuth credentials. The
+	 * default value is {@link HttpHeaderName#AUTHORIZATION}. Implementations may
+	 * override the value in case the header name is different.
+	 * 
+	 * @return
+	 */
+	protected String getAuthorizationHeaderName() {
+		return HttpHeaderName.AUTHORIZATION;
+	}
 }

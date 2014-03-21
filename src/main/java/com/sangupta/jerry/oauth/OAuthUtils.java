@@ -40,6 +40,7 @@ import org.apache.http.message.BasicNameValuePair;
 
 import com.sangupta.jerry.encoder.Base62Encoder;
 import com.sangupta.jerry.encoder.Base64Encoder;
+import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebInvoker;
 import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.http.WebRequestMethod;
@@ -57,7 +58,42 @@ import com.sangupta.jerry.util.UriUtils;
  * @since 1.0
  */
 public class OAuthUtils {
-	
+
+	/**
+	 * Sign the given {@link WebRequest} with the given application {@link KeySecretPair} and user's {@link KeySecretPair}.
+	 * 
+	 * @param request
+	 * 
+	 * @param keySecretPair
+	 * 
+	 * @param userSecretPair
+	 * 
+	 * @param oAuthSignatureMethod
+	 * 
+	 * @return
+	 */
+	public static String signRequest(WebRequest request, KeySecretPair keySecretPair, KeySecretPair userSecretPair, OAuthSignatureMethod oAuthSignatureMethod, WebForm authorizationParameters) {
+		StringBuilder builder = new StringBuilder();
+		
+		// first the HTTP VERB
+		builder.append(request.getVerb().toString().toUpperCase());
+		builder.append("&");
+		
+		// then the end point without any query parameters or fragment
+		URI uri = request.getURI();
+		builder.append(getSignableBase(uri));
+
+		// collect all parameters
+		TreeMap<String, String> requestParams = extractURIParameters(uri);
+		String paramString = buildParamString(null, requestParams);
+		
+		// now build up the signing string
+		final String signable = builder.toString();
+		
+		// compute the signature
+		return generateSignature(keySecretPair, userSecretPair, signable, OAuthSignatureMethod.HMAC_SHA1);
+	}
+
 	public static WebRequest signRequest(WebRequest request, KeySecretPair consumer, KeySecretPair userToken, String timeStamp, String nonce) {
 		StringBuilder builder = new StringBuilder();
 		
