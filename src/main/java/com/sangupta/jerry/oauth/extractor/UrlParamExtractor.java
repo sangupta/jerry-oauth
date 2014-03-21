@@ -27,9 +27,11 @@ import java.util.Map;
 import com.sangupta.jerry.util.AssertUtils;
 
 /**
+ * A {@link TokenExtractor} implementation that takes in URL-encoded
+ * parameter string and parses to extract token parameters.
  * 
  * @author sangupta
- *
+ * @since 1.0
  */
 public class UrlParamExtractor implements TokenExtractor {
 

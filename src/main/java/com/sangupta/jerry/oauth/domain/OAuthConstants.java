@@ -25,7 +25,7 @@ package com.sangupta.jerry.oauth.domain;
  * Constants with regards to OAuth workflows.
  * 
  * @author sangupta
- *
+ * @since 1.0
  */
 public interface OAuthConstants {
 	

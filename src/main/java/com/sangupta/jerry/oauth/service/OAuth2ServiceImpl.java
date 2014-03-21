@@ -64,9 +64,10 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 		WebRequest request;
 		
 		WebForm webForm = WebForm.newForm().addParam("code", code)
-				  .addParam("client_id", this.keySecretPair.getKey())
-				  .addParam("client_secret", this.keySecretPair.getSecret())
-				  .addParam("redirect_uri", redirectURL);
+										   .addParam("client_id", this.keySecretPair.getKey())
+										   .addParam("client_secret", this.keySecretPair.getSecret())
+										   .addParam("redirect_uri", redirectURL);
+		
 		massageAuthorizationURL(webForm);
 
 		if(getAuthorizationMethod() == WebRequestMethod.POST) {

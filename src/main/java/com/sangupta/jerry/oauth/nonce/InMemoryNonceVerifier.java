@@ -34,7 +34,7 @@ import com.sangupta.jerry.util.DateUtils;
  * globally and NOT per consumer key.
  * 
  * @author sangupta
- *
+ * @since 1.0
  */
 public class InMemoryNonceVerifier implements NonceVerifier {
 	

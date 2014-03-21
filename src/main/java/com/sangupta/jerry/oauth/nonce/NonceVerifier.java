@@ -26,7 +26,7 @@ package com.sangupta.jerry.oauth.nonce;
  * verifying service for OAuth based requests.
  * 
  * @author sangupta
- *
+ * @since 1.0
  */
 public interface NonceVerifier {
 

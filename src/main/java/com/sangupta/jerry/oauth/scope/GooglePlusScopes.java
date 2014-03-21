@@ -1,5 +1,10 @@
 package com.sangupta.jerry.oauth.scope;
 
+/**
+ * 
+ * @author sangupta
+ *
+ */
 public interface GooglePlusScopes {
 	
 	public static final String LOGIN = "https://www.googleapis.com/auth/plus.login";

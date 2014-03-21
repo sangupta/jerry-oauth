@@ -25,9 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Contract for implementations that need to parse various
+ * formats of tokens presented.
  * 
  * @author sangupta
- *
+ * @since 1.0
  */
 public interface TokenExtractor {
 	
