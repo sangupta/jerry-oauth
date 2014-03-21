@@ -1,9 +1,9 @@
 /**
  *
- * jerry - Common Java Functionality
- * Copyright (c) 2012, Sandeep Gupta
+ * jerry-oauth : Common Java OAuth functionality
+ * Copyright (c) 2012-2014, Sandeep Gupta
  * 
- * http://www.sangupta/projects/jerry
+ * http://sangupta.com/projects/jerry-oauth
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import com.sangupta.jerry.oauth.domain.KeySecretPair;
  * for users.
  * 
  * @author sangupta
- *
+ * @since 1.0
  */
 public interface OAuthTokenGenerator {
 	
