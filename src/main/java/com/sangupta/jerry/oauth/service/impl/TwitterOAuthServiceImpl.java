@@ -19,35 +19,39 @@
  * 
  */
 
-package com.sangupta.jerry.oauth.service;
+package com.sangupta.jerry.oauth.service.impl;
 
 import com.sangupta.jerry.http.WebRequest;
+import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
+import com.sangupta.jerry.oauth.service.OAuth1ServiceImpl;
 
 /**
- * Base contract for all OAuth based services: 1.0, 2.0 or hybrid. Decouples
- * the callee from the actual implementation to be used.
  * 
  * @author sangupta
  * @since 1.0
  */
-public interface OAuthService {
-	
-	/**
-	 * Get the authentication URL that the user needs to be redirected to.
-	 * 
-	 * @param successUrl the callback success url that the call will come back to
-	 * 
-	 * @param scope the scopes to be used for authentication
-	 * 
-	 */
-	public String getLoginURL(String successUrl, String scope);
-	
-	/**
-	 * 
-	 * @param request
-	 * @param accessPair
-	 */
-	public void signRequest(WebRequest request, KeySecretPair accessPair);
+public class TwitterOAuthServiceImpl extends OAuth1ServiceImpl {
+
+	protected TwitterOAuthServiceImpl(KeySecretPair applicationKeySecretPair) {
+		super(applicationKeySecretPair);
+	}
+
+	@Override
+	public void signRequest(WebRequest request, KeySecretPair accessPair) {
+		
+	}
+
+	@Override
+	protected String getRequestTokenURL() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected WebRequestMethod getRequestTokenMethod() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

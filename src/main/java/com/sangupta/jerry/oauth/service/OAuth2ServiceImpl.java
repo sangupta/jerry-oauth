@@ -33,6 +33,7 @@ import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.util.UrlManipulator;
 
 /**
+ * Base implementation for all clients that support the OAuth 2.0 specifications.
  * 
  * @author sangupta
  * @since 1.0
