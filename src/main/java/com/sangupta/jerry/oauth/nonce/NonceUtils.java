@@ -2,6 +2,8 @@ package com.sangupta.jerry.oauth.nonce;
 
 import java.util.UUID;
 
+import com.sangupta.jerry.encoder.Base62Encoder;
+
 /**
  * Some utility functions around NONCE strings
  * used in OAuth world.
@@ -21,4 +23,14 @@ public class NonceUtils {
 		return UUID.randomUUID().toString();
 	}
 
+	/**
+	 * Generates an encoded nonce that comprises of a UUID, the current
+	 * system time, and the time in nanoseconds.
+	 * 
+	 * @return
+	 */
+	public static String getNonce() {
+		UUID uuid = UUID.randomUUID();
+		return Base62Encoder.encode(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits(), System.currentTimeMillis(), System.nanoTime());
+	}
 }

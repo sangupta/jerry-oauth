@@ -33,7 +33,7 @@ import com.sangupta.jerry.oauth.service.OAuth1ServiceImpl;
  */
 public class TwitterOAuthServiceImpl extends OAuth1ServiceImpl {
 
-	protected TwitterOAuthServiceImpl(KeySecretPair applicationKeySecretPair) {
+	public TwitterOAuthServiceImpl(KeySecretPair applicationKeySecretPair) {
 		super(applicationKeySecretPair);
 	}
 

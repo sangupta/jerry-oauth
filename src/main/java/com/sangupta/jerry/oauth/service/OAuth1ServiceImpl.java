@@ -26,6 +26,7 @@ import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebInvoker;
 import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.http.WebRequestMethod;
+import com.sangupta.jerry.http.WebResponse;
 import com.sangupta.jerry.oauth.OAuthUtils;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
@@ -79,11 +80,16 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		massageTokenRequestHeader(webForm, successUrl, scope);
 		
 		// generate the signature for the request
-		String signature = OAuthUtils.signRequest(request, this.keySecretPair, null, getOAuthSignatureMethod(), webForm);
-		
+		OAuthUtils.signRequest(request, this.keySecretPair, null, getOAuthSignatureMethod(), webForm);
+
 		// sign the request with the details
+		OAuthUtils.buildAuthorizationHeader(request, webForm, getAuthorizationHeaderName(), getAuthorizationHeaderPrefix());
 		
 		// hit the request for request token
+		WebResponse response = WebInvoker.executeSilently(request);
+		if(response == null || !response.isSuccess()) {
+			return null;
+		}
 		
 		return null;
 	}
@@ -156,4 +162,17 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	protected String getAuthorizationHeaderName() {
 		return HttpHeaderName.AUTHORIZATION;
 	}
+	
+	/**
+	 * Return the prefix to be used in the Authorization header value. The default
+	 * value is {@link OAuthConstants#OAUTH_AUTHORIZATION_HEADER_PREFIX}. Implementations
+	 * may override the value in case the prefix need not be sent (in which case this should
+	 * return a <code>null</code>), or a different value.
+	 * 
+	 * @return
+	 */
+	protected String getAuthorizationHeaderPrefix() {
+		return OAuthConstants.OAUTH_AUTHORIZATION_HEADER_PREFIX;
+	}
+	
 }

@@ -23,11 +23,12 @@ package com.sangupta.jerry.oauth;
 
 import java.util.Map;
 
+import com.sangupta.jerry.http.HttpHeaderName;
 import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.http.WebRequestMethod;
+import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureMethod;
-import com.sangupta.jerry.oauth.domain.KeySecretPair;
 
 /**
  * @author sangupta
@@ -62,7 +63,7 @@ public class OAuthClient {
 	 * @param consumer
 	 */
 	public OAuthClient(KeySecretPair consumer) {
-		this(consumer, OAuthSignatureMethod.HMAC_SHA1, OAuthConstants.OAUTH_VERSION_1_0, OAuthConstants.OAUTH_AUTHORIZATION_HEADER_NAME, false);
+		this(consumer, OAuthSignatureMethod.HMAC_SHA1, OAuthConstants.OAUTH_VERSION_1_0, HttpHeaderName.AUTHORIZATION, false);
 	}
 
 	/**

@@ -30,23 +30,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.UUID;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.sangupta.jerry.encoder.Base62Encoder;
 import com.sangupta.jerry.encoder.Base64Encoder;
 import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebInvoker;
 import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.http.WebRequestMethod;
+import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureMethod;
-import com.sangupta.jerry.oauth.domain.KeySecretPair;
+import com.sangupta.jerry.oauth.nonce.NonceUtils;
 import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.jerry.util.StringUtils;
 import com.sangupta.jerry.util.UriUtils;
@@ -58,21 +59,36 @@ import com.sangupta.jerry.util.UriUtils;
  * @since 1.0
  */
 public class OAuthUtils {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(OAuthUtils.class);
 
 	/**
-	 * Sign the given {@link WebRequest} with the given application {@link KeySecretPair} and user's {@link KeySecretPair}.
+	 * Sign the given {@link WebRequest} with the given application
+	 * {@link KeySecretPair} and user's {@link KeySecretPair}. The signature
+	 * thus computed is added to the <code>authorizationParameters</code>
+	 * supplied in over here. The {@link WebForm} values are NOT appended to the
+	 * {@link WebRequest} supplied, and callee's should add it themselves
+	 * depending if the params are added in body or as a header, and with what
+	 * header name.
 	 * 
 	 * @param request
+	 *            the request that needs to be signed
 	 * 
 	 * @param keySecretPair
+	 *            the application specific key-secret pair to use
 	 * 
 	 * @param userSecretPair
+	 *            the user-specific key-secret pair to use
 	 * 
 	 * @param oAuthSignatureMethod
+	 *            the signature method to use for computing the signatures
 	 * 
-	 * @return
+	 * @param authorizationParameters
+	 *            the authorization parameters that need to be used while
+	 *            signing
+	 * 
 	 */
-	public static String signRequest(WebRequest request, KeySecretPair keySecretPair, KeySecretPair userSecretPair, OAuthSignatureMethod oAuthSignatureMethod, WebForm authorizationParameters) {
+	public static void signRequest(WebRequest request, KeySecretPair keySecretPair, KeySecretPair userSecretPair, OAuthSignatureMethod oAuthSignatureMethod, WebForm authorizationParameters) {
 		StringBuilder builder = new StringBuilder();
 		
 		// first the HTTP VERB
@@ -82,56 +98,133 @@ public class OAuthUtils {
 		// then the end point without any query parameters or fragment
 		URI uri = request.getURI();
 		builder.append(getSignableBase(uri));
-
-		// collect all parameters
-		TreeMap<String, String> requestParams = extractURIParameters(uri);
-		String paramString = buildParamString(null, requestParams);
-		
-		// now build up the signing string
-		final String signable = builder.toString();
-		
-		// compute the signature
-		return generateSignature(keySecretPair, userSecretPair, signable, OAuthSignatureMethod.HMAC_SHA1);
-	}
-
-	public static WebRequest signRequest(WebRequest request, KeySecretPair consumer, KeySecretPair userToken, String timeStamp, String nonce) {
-		StringBuilder builder = new StringBuilder();
-		
-		// first the HTTP VERB
-		builder.append(request.getVerb().toString().toUpperCase());
 		builder.append("&");
 		
-		// then the end point without any path or query or fragment
-		URI uri = request.getURI();
-		builder.append(getSignableBase(uri));
-		
 		// collect all parameters
 		TreeMap<String, String> requestParams = extractURIParameters(uri);
-		String paramString = buildParamString(null, requestParams);
+		String paramString = buildParamString(requestParams, authorizationParameters);
+		builder.append(paramString);
 		
 		// now build up the signing string
 		final String signable = builder.toString();
+		LOGGER.debug("Signable string generated as: {}", signable);
 		
 		// compute the signature
-		final String signature = generateSignature(consumer, userToken, signable, OAuthSignatureMethod.HMAC_SHA1);
-		
-		// append to the request
-//		params.put(OAuthConstants.OAUTH_SIGNATURE, signature);
-//		
-//		// build oauth header
-//		request.addHeader(HttpHeaderName.AUTHORIZATION, "OAuth " + getAllOAuthParams(params));
-		
-		return request;
+		String signature = generateSignature(keySecretPair, userSecretPair, signable, OAuthSignatureMethod.HMAC_SHA1);
+		authorizationParameters.addParam(OAuthConstants.OAUTH_SIGNATURE, signature);
 	}
-	
-	public static String buildParamString(Object object, TreeMap<String, String> params) {
-		StringBuilder builder = new StringBuilder();
+
+	/**
+	 * Build an authorization header for the request.
+	 * 
+	 * @param request
+	 * 
+	 * @param webForm
+	 * 
+	 * @param authorizationHeaderName
+	 * 
+	 * @param authorizationHeaderPrefix
+	 */
+	public static void buildAuthorizationHeader(WebRequest request,	WebForm webForm, String authorizationHeaderName, String authorizationHeaderPrefix) {
+		if(request == null) {
+			throw new IllegalArgumentException("WebRequest to sign cannot be null");
+		}
 		
-//		params.put(OAuthConstants.OAUTH_CONSUMER_KEY, consumerKey);
-//		params.put(OAuthConstants.OAUTH_NONCE, generateNonce());
-//		params.put(OAuthConstants.OAUTH_SIGNATURE_METHOD, signatureMethod.getOauthName());
-//		params.put(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis()));
-//		params.put(OAuthConstants.OAUTH_VERSION, oAuthVersion);
+		if(webForm == null) {
+			throw new IllegalArgumentException("WebForm containing signing parameters cannot be null");
+		}
+		
+		if(AssertUtils.isEmpty(authorizationHeaderName)) {
+			throw new IllegalArgumentException("Authorization header name to use cannot be null/empty");
+		}
+		
+		StringBuilder builder = new StringBuilder(1024);
+		if(AssertUtils.isNotBlank(authorizationHeaderPrefix)) {
+			builder.append(authorizationHeaderPrefix);
+			builder.append(' ');
+		}
+		
+		// start adding all authorization params
+		List<NameValuePair> pairs = webForm.build();
+		for(int index = 0; index < pairs.size(); index++) {
+			NameValuePair pair = pairs.get(0);
+			
+			if(index > 0) {
+				builder.append(',');
+			}
+			
+			builder.append(pair.getName());
+			builder.append("=\"");
+			builder.append(UriUtils.encodeURIComponent(pair.getValue()));
+			builder.append("\"");
+		}
+		
+		request.addHeader(authorizationHeaderName, builder.toString());
+	}
+
+//	public static WebRequest signRequest(WebRequest request, KeySecretPair consumer, KeySecretPair userToken, String timeStamp, String nonce) {
+//		StringBuilder builder = new StringBuilder();
+//		
+//		// first the HTTP VERB
+//		builder.append(request.getVerb().toString().toUpperCase());
+//		builder.append("&");
+//		
+//		// then the end point without any path or query or fragment
+//		URI uri = request.getURI();
+//		builder.append(getSignableBase(uri));
+//		
+//		// collect all parameters
+//		TreeMap<String, String> requestParams = extractURIParameters(uri);
+//		String paramString = buildParamString(null, requestParams);
+//		
+//		// now build up the signing string
+//		final String signable = builder.toString();
+//		
+//		// compute the signature
+//		final String signature = generateSignature(consumer, userToken, signable, OAuthSignatureMethod.HMAC_SHA1);
+//		
+//		// append to the request
+////		params.put(OAuthConstants.OAUTH_SIGNATURE, signature);
+////		
+////		// build oauth header
+////		request.addHeader(HttpHeaderName.AUTHORIZATION, "OAuth " + getAllOAuthParams(params));
+//		
+//		return request;
+//	}
+	
+	/**
+	 * Given a list of parameters (including the OAuth parameters) build the
+	 * unique parameter string that is used to generate the signable string.
+	 * 
+	 * @param params
+	 *            the request parameters if any
+	 * 
+	 * @param webForm
+	 *            the OAuth params
+	 * 
+	 * @return the parameters string to be used to generate the signable string
+	 */
+	public static String buildParamString(TreeMap<String, String> params, WebForm webForm) {
+		StringBuilder builder = new StringBuilder(1024);
+		
+		// add all to the list of params
+		for(NameValuePair pair : webForm.build()) {
+			params.put(pair.getName(), pair.getValue());
+		}
+		
+		// build the string
+		boolean first = true;
+		for(String key : params.keySet()) {
+			if(!first) {
+				builder.append('&');
+			} else {
+				first = false;
+			}
+			
+			builder.append(key);
+			builder.append('=');
+			builder.append(UriUtils.encodeURIComponent(params.get(key)));
+		}
 		
 		return builder.toString();
 	}
@@ -251,7 +344,7 @@ public class OAuthUtils {
 		
 		TreeMap<String, String> params = new TreeMap<String, String>();
 		params.put(OAuthConstants.OAUTH_CONSUMER_KEY, consumerKey);
-		params.put(OAuthConstants.OAUTH_NONCE, generateNonce());
+		params.put(OAuthConstants.OAUTH_NONCE, NonceUtils.getNonce());
 		params.put(OAuthConstants.OAUTH_SIGNATURE_METHOD, signatureMethod.getOauthName());
 		params.put(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis()));
 		params.put(OAuthConstants.OAUTH_VERSION, oAuthVersion);
@@ -308,7 +401,7 @@ public class OAuthUtils {
 		
 		TreeMap<String, String> params = new TreeMap<String, String>();
 		params.put(OAuthConstants.OAUTH_CONSUMER_KEY, consumerKey);
-		params.put(OAuthConstants.OAUTH_NONCE, generateNonce());
+		params.put(OAuthConstants.OAUTH_NONCE, NonceUtils.getNonce());
 		params.put(OAuthConstants.OAUTH_SIGNATURE_METHOD, signatureMethod.getOauthName());
 		params.put(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis()));
 		params.put(OAuthConstants.OAUTH_VERSION, oAuthVersion);
@@ -485,17 +578,6 @@ public class OAuthUtils {
 		}
 		
 		return builder.toString();
-	}
-
-	/**
-	 * Method that generates a NONCE string based on a randomly generated UUID 
-	 * and current millis and nano timestamp.
-	 * 
-	 * @return
-	 */
-	public static String generateNonce() {
-		UUID uuid = UUID.randomUUID();
-		return Base62Encoder.encode(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits(), System.currentTimeMillis(), System.nanoTime());
 	}
 
 }

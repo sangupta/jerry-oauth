@@ -45,7 +45,7 @@ public interface OAuthConstants {
 	
 	public static final String OAUTH_VERSION_1_0 = "1.0";
 	
-	public static final String OAUTH_AUTHORIZATION_HEADER_NAME = "OAuth";
+	public static final String OAUTH_AUTHORIZATION_HEADER_PREFIX = "OAuth";
 	
 	// XAuth
 	
