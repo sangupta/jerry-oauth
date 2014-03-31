@@ -236,12 +236,13 @@ public class OAuthUtils {
 	 * @return
 	 */
 	public static TreeMap<String, String> extractURIParameters(URI uri) {
+		final TreeMap<String, String> params = new TreeMap<String, String>();
+		
 		String query = uri.getQuery();
 		if(AssertUtils.isEmpty(query)) {
-			return null;
+			return params;
 		}
 		
-		TreeMap<String, String> params = new TreeMap<String, String>();
 		String[] pairs = query.split("&");
 		for(String pair : pairs) {
 			String[] tokens = pair.split("=");
@@ -498,6 +499,10 @@ public class OAuthUtils {
 	 * @return
 	 */
 	public static String generateSignature(KeySecretPair consumer, KeySecretPair userToken, String signable, OAuthSignatureMethod signingMethod) {
+		if(userToken == null) {
+			return generateSignature(consumer.getSecret(), null, signable, signingMethod);
+		}
+		
 		return generateSignature(consumer.getSecret(), userToken.getSecret(), signable, signingMethod);
 	}
 

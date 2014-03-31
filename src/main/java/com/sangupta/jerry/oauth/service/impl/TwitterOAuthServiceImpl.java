@@ -44,7 +44,7 @@ public class TwitterOAuthServiceImpl extends OAuth1ServiceImpl {
 
 	@Override
 	protected String getRequestTokenURL() {
-		return null;
+		return "https://api.twitter.com/oauth/request_token";
 	}
 
 	protected void massageTokenRequestHeader(WebForm webForm, String successUrl, String scope) {
