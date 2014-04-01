@@ -53,6 +53,10 @@ public class TwitterOAuthServiceImpl extends OAuth1ServiceImpl {
 	protected String getAuthenticationURL() {
 		return "https://api.twitter.com/oauth/authenticate";
 	}
+	
+	protected String getAuthorizationTokenURL() {
+		return "https://api.twitter.com/oauth/access_token";
+	}
 
 	protected void massageTokenRequestHeader(WebForm webForm, String successUrl, String scope) {
 		if(AssertUtils.isNotEmpty(successUrl)) {

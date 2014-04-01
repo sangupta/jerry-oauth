@@ -23,6 +23,8 @@ package com.sangupta.jerry.oauth.service;
 
 import java.util.Map;
 
+import org.apache.http.entity.ContentType;
+
 import com.sangupta.jerry.http.HttpHeaderName;
 import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebInvoker;
@@ -35,6 +37,7 @@ import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureMethod;
 import com.sangupta.jerry.oauth.extractor.TokenExtractor;
 import com.sangupta.jerry.oauth.extractor.UrlParamExtractor;
+import com.sangupta.jerry.oauth.nonce.NonceUtils;
 
 /**
  * Base implementation for all clients that support the OAuth 1.0 specifications.
@@ -74,7 +77,7 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		WebRequest request = WebInvoker.getWebRequest(getRequestTokenURL(), getRequestTokenMethod());
 		
 		WebForm webForm = WebForm.newForm().addParam(OAuthConstants.OAUTH_CONSUMER_KEY, this.keySecretPair.getKey())
-										   .addParam(OAuthConstants.OAUTH_NONCE, "7e92c5518c34bb6f0a723d68a5fe9259") //NonceUtils.getUUIDNonce())
+										   .addParam(OAuthConstants.OAUTH_NONCE, NonceUtils.getUUIDNonce())
 										   .addParam(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
 										   .addParam(OAuthConstants.OAUTH_VERSION, getOAuthVersion())
 										   .addParam(OAuthConstants.OAUTH_SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
@@ -98,6 +101,44 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		KeySecretPair tokenPair = new KeySecretPair(params.get("oauth_token"), params.get("oauth_token_secret"));
 		
 		return this.getAuthenticationURL() + "?oauth_token=" + tokenPair.getKey();
+	}
+	
+	/**
+	 * 
+	 * @param token
+	 * @param verifier
+	 * @param redirectURL
+	 * @return
+	 */
+	public String getAuthorizationResponse(String token, String verifier, String redirectURL) {
+		final KeySecretPair authTokenPair = new KeySecretPair(token, verifier);
+		WebRequest request = WebInvoker.getWebRequest(getAuthorizationTokenURL(), getAuthorizationTokenMethod());
+		
+		request.bodyString("oauth_verifier=" + verifier, ContentType.APPLICATION_FORM_URLENCODED);
+		
+		WebForm webForm = WebForm.newForm().addParam(OAuthConstants.OAUTH_CONSUMER_KEY, this.keySecretPair.getKey())
+				   .addParam(OAuthConstants.OAUTH_NONCE, NonceUtils.getUUIDNonce())
+				   .addParam(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
+				   .addParam(OAuthConstants.OAUTH_VERSION, getOAuthVersion())
+				   .addParam(OAuthConstants.OAUTH_TOKEN, token)
+				   .addParam(OAuthConstants.OAUTH_SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
+
+		// generate the signature for the request
+		OAuthUtils.signRequest(request, this.keySecretPair, authTokenPair, getOAuthSignatureMethod(), webForm);
+		
+		// sign the request with the details
+		OAuthUtils.buildAuthorizationHeader(request, webForm, getAuthorizationHeaderName(), getAuthorizationHeaderPrefix());
+		
+		// hit the request for request token
+		WebResponse response = WebInvoker.executeSilently(request);
+		if(response == null) {
+			return null;
+		}
+		
+		System.out.println(response.trace());
+		System.out.println(response.getContent());
+		
+		return response.getContent();
 	}
 	
 	/**
@@ -160,11 +201,18 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	protected abstract String getRequestTokenURL();
 	
 	/**
-	 * Obtain the end-point for obtaining the authentication.
+	 * Return the end-point for obtaining the authentication.
 	 * 
 	 * @return
 	 */
 	protected abstract String getAuthenticationURL();
+	
+	/**
+	 * Return the end-point for obtaining the authorization response.
+	 * 
+	 * @return
+	 */
+	protected abstract String getAuthorizationTokenURL();
 
 	/**
 	 * Return the HTTP verb to be used when making the request-token request. The
@@ -174,6 +222,10 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	 * @return
 	 */
 	protected WebRequestMethod getRequestTokenMethod() {
+		return WebRequestMethod.POST;
+	}
+	
+	protected WebRequestMethod getAuthorizationTokenMethod() {
 		return WebRequestMethod.POST;
 	}
 	
