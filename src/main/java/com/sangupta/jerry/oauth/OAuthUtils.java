@@ -107,7 +107,7 @@ public class OAuthUtils {
 		
 		// now build up the signing string
 		final String signable = builder.toString();
-		LOGGER.debug("Signable string generated as: {}", signable);
+		System.out.println("Signable string generated as: " + signable);
 		
 		// compute the signature
 		String signature = generateSignature(keySecretPair, userSecretPair, signable, OAuthSignatureMethod.HMAC_SHA1);
@@ -526,7 +526,14 @@ public class OAuthUtils {
 			throw new IllegalArgumentException("Signable string cannot be null/empty");
 		}
 		
-		return doSigning(signable, UriUtils.encodeURIComponent(consumerSecret, true) + "&" + UriUtils.encodeURIComponent(tokenSecret, true), signingMethod);
+		final String signingKey;
+		if(AssertUtils.isNotEmpty(tokenSecret)) {
+			signingKey = UriUtils.encodeURIComponent(consumerSecret, false) + "&" + UriUtils.encodeURIComponent(tokenSecret, false);
+		} else {
+			signingKey = UriUtils.encodeURIComponent(consumerSecret, false) + "&";
+		}
+		
+		return createSignature(signable, signingKey, signingMethod);
 	}
 	
 	/**
@@ -538,7 +545,7 @@ public class OAuthUtils {
 	 * @param method
 	 * @return
 	 */
-	public static String doSigning(String signable, String keyString, OAuthSignatureMethod signingMethod) {
+	public static String createSignature(String signable, String keyString, OAuthSignatureMethod signingMethod) {
 		SecretKeySpec key = new SecretKeySpec((keyString).getBytes(StringUtils.CHARSET_UTF8), signingMethod.getAlgorithmName());
 		Mac mac;
 		try {
