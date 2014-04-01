@@ -103,7 +103,7 @@ public class OAuthUtils {
 		// collect all parameters
 		TreeMap<String, String> requestParams = extractURIParameters(uri);
 		String paramString = buildParamString(requestParams, authorizationParameters);
-		builder.append(paramString);
+		builder.append(UriUtils.encodeURIComponent(paramString));
 		
 		// now build up the signing string
 		final String signable = builder.toString();
@@ -147,10 +147,10 @@ public class OAuthUtils {
 		// start adding all authorization params
 		List<NameValuePair> pairs = webForm.build();
 		for(int index = 0; index < pairs.size(); index++) {
-			NameValuePair pair = pairs.get(0);
+			NameValuePair pair = pairs.get(index);
 			
 			if(index > 0) {
-				builder.append(',');
+				builder.append(", ");
 			}
 			
 			builder.append(pair.getName());
@@ -311,7 +311,7 @@ public class OAuthUtils {
 		builder.append(uri.getHost().toLowerCase());
 		
 		int port = uri.getPort();
-		if(port != 80) {
+		if(!(port == 80 || port == -1)) {
 			builder.append(':');
 			builder.append(String.valueOf(port));
 		}
@@ -445,7 +445,7 @@ public class OAuthUtils {
 	 * @return
 	 */
 	private static List<NameValuePair> getBodyParams(TreeMap<String, String> params, boolean includeOAuthParamsInBody) {
-		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+		final List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 		
 		for(Entry<String, String> entry : params.entrySet()) {
 			String key = entry.getKey();
@@ -453,10 +453,10 @@ public class OAuthUtils {
 				continue;
 			}
 			
-			nvps.add(new BasicNameValuePair(key, entry.getValue()));
+			nameValuePairs.add(new BasicNameValuePair(key, entry.getValue()));
 		}
 		
-		return nvps;
+		return nameValuePairs;
 	}
 
 	/**
