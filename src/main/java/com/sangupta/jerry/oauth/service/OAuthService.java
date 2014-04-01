@@ -36,14 +36,19 @@ public interface OAuthService {
 	/**
 	 * Get the authentication URL that the user needs to be redirected to.
 	 * 
-	 * @param successUrl the callback success url that the call will come back to
+	 * @param successUrl
+	 *            the callback success url that the call will come back to
 	 * 
-	 * @param scope the scopes to be used for authentication
+	 * @param scope
+	 *            the scopes to be used for authentication
+	 * 
+	 * @return the login url to which the user should be redirected
 	 * 
 	 */
 	public String getLoginURL(String successUrl, String scope);
 	
 	/**
+	 * Sign the given request using the given access pair.
 	 * 
 	 * @param request
 	 * @param accessPair

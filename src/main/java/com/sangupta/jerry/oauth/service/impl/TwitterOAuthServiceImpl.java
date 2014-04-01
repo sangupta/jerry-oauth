@@ -26,6 +26,7 @@ import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.service.OAuth1ServiceImpl;
+import com.sangupta.jerry.util.AssertUtils;
 
 /**
  * 
@@ -47,9 +48,16 @@ public class TwitterOAuthServiceImpl extends OAuth1ServiceImpl {
 	protected String getRequestTokenURL() {
 		return "https://api.twitter.com/oauth/request_token";
 	}
+	
+	@Override
+	protected String getAuthenticationURL() {
+		return "https://api.twitter.com/oauth/authenticate";
+	}
 
 	protected void massageTokenRequestHeader(WebForm webForm, String successUrl, String scope) {
-//		webForm.addParam("oauth_callback", successUrl);
+		if(AssertUtils.isNotEmpty(successUrl)) {
+			webForm.addParam("oauth_callback", successUrl);
+		}
 		webForm.addParam(OAuthConstants.OAUTH_TOKEN, "");
 	}
 

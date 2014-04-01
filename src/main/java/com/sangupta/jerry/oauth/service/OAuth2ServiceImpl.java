@@ -45,7 +45,7 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 	protected OAuth2ServiceImpl(KeySecretPair keySecretPair) {
 		this.keySecretPair = keySecretPair;
 	}
-
+	
 	@Override
 	public String getLoginURL(String successUrl, String scope) {
 		UrlManipulator um = new UrlManipulator(getLoginEndPoint());

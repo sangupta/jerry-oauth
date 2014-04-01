@@ -21,6 +21,8 @@
 
 package com.sangupta.jerry.oauth.service;
 
+import java.util.Map;
+
 import com.sangupta.jerry.http.HttpHeaderName;
 import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebInvoker;
@@ -31,7 +33,8 @@ import com.sangupta.jerry.oauth.OAuthUtils;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureMethod;
-import com.sangupta.jerry.oauth.nonce.NonceUtils;
+import com.sangupta.jerry.oauth.extractor.TokenExtractor;
+import com.sangupta.jerry.oauth.extractor.UrlParamExtractor;
 
 /**
  * Base implementation for all clients that support the OAuth 1.0 specifications.
@@ -71,8 +74,8 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		WebRequest request = WebInvoker.getWebRequest(getRequestTokenURL(), getRequestTokenMethod());
 		
 		WebForm webForm = WebForm.newForm().addParam(OAuthConstants.OAUTH_CONSUMER_KEY, this.keySecretPair.getKey())
-										   .addParam(OAuthConstants.OAUTH_NONCE, NonceUtils.getUUIDNonce())
-										   .addParam(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis()))
+										   .addParam(OAuthConstants.OAUTH_NONCE, "7e92c5518c34bb6f0a723d68a5fe9259") //NonceUtils.getUUIDNonce())
+										   .addParam(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
 										   .addParam(OAuthConstants.OAUTH_VERSION, getOAuthVersion())
 										   .addParam(OAuthConstants.OAUTH_SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
 		
@@ -91,7 +94,22 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 			return null;
 		}
 		
-		return null;
+		Map<String, String> params = getRequestTokenExtractor().extractTokens(response.getContent());
+		KeySecretPair tokenPair = new KeySecretPair(params.get("oauth_token"), params.get("oauth_token_secret"));
+		
+		return this.getAuthenticationURL() + "?oauth_token=" + tokenPair.getKey();
+	}
+	
+	/**
+	 * Specify the token extractor to be used after the request token API
+	 * has been successfully called. Default is to use the {@link UrlParamExtractor}.
+	 * Implementation may override the function if they wish to choose
+	 * another {@link TokenExtractor} implementation.
+	 * 
+	 * @return
+	 */
+	protected TokenExtractor getRequestTokenExtractor() {
+		return new UrlParamExtractor();
 	}
 
 	/**
@@ -140,6 +158,13 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	 * @return
 	 */
 	protected abstract String getRequestTokenURL();
+	
+	/**
+	 * Obtain the end-point for obtaining the authentication.
+	 * 
+	 * @return
+	 */
+	protected abstract String getAuthenticationURL();
 
 	/**
 	 * Return the HTTP verb to be used when making the request-token request. The
