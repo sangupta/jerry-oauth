@@ -21,9 +21,7 @@
 
 package com.sangupta.jerry.oauth.service.impl;
 
-import com.sangupta.jerry.http.HttpHeaderName;
 import com.sangupta.jerry.http.WebForm;
-import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.service.OAuth2ServiceImpl;
@@ -36,10 +34,6 @@ import com.sangupta.jerry.util.UrlManipulator;
  * @since 1.0
  */
 public class GoogleOAuthServiceImpl extends OAuth2ServiceImpl {
-	
-	public static final String END_POINT = "https://accounts.google.com/o/oauth2/auth";
-	
-	public static final String AUTH_END_POINT = "https://accounts.google.com/o/oauth2/token";
 	
 	private String loginHint = null;
 	
@@ -60,7 +54,7 @@ public class GoogleOAuthServiceImpl extends OAuth2ServiceImpl {
 
 	@Override
 	protected String getLoginEndPoint() {
-		return END_POINT;
+		return "https://accounts.google.com/o/oauth2/auth";
 	}
 
 	public void setLoginHint(String loginHint) {
@@ -69,17 +63,12 @@ public class GoogleOAuthServiceImpl extends OAuth2ServiceImpl {
 
 	@Override
 	protected String getAuthorizationEndPoint() {
-		return AUTH_END_POINT;
+		return "https://accounts.google.com/o/oauth2/token";
 	}
 
 	@Override
 	protected WebRequestMethod getAuthorizationMethod() {
 		return WebRequestMethod.POST;
-	}
-
-	@Override
-	public void signRequest(WebRequest request, KeySecretPair accessPair) {
-		request.addHeader(HttpHeaderName.AUTHORIZATION, "Bearer " + accessPair.getKey());
 	}
 
 	@Override

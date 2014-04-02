@@ -23,13 +23,16 @@ package com.sangupta.jerry.oauth.domain;
 
 import java.util.UUID;
 
+import net.jcip.annotations.Immutable;
+
 /**
- * Value object to store a key-value pair that together make
- * up an {@link KeySecretPair}. The object is immutable.
+ * Value object to store a key-value pair that together make up an
+ * {@link KeySecretPair}. The object is immutable.
  * 
  * @author sangupta
  * @since 1.0
  */
+@Immutable
 public class KeySecretPair {
 
 	/**
@@ -43,11 +46,14 @@ public class KeySecretPair {
 	private String secret;
 
 	/**
-	 * Default constructor that creates a token from the given key
-	 * and secret.
+	 * Default constructor that creates a token from the given key and secret.
 	 * 
 	 * @param key
+	 *            the key to be used
+	 * 
 	 * @param secret
+	 *            the secret to be used
+	 * 
 	 */
 	public KeySecretPair(String key, String secret) {
 		this.key = key;
@@ -58,7 +64,7 @@ public class KeySecretPair {
 	 * Utility method to generate a new {@link KeySecretPair} using {@link UUID}
 	 * values as both key and secret.
 	 * 
-	 * @return
+	 * @return the {@link KeySecretPair} thus generated
 	 */
 	public static KeySecretPair uuidRandomToken() {
 		return new KeySecretPair(UUID.randomUUID().toString(), UUID.randomUUID().toString());

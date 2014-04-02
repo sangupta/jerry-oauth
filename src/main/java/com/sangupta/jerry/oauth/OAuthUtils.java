@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sangupta.jerry.encoder.Base64Encoder;
+import com.sangupta.jerry.http.HttpHeaderName;
 import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebInvoker;
 import com.sangupta.jerry.http.WebRequest;
@@ -60,6 +61,9 @@ import com.sangupta.jerry.util.UriUtils;
  */
 public class OAuthUtils {
 	
+	/**
+	 * Logger to be used
+	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(OAuthUtils.class);
 
 	/**
@@ -85,7 +89,8 @@ public class OAuthUtils {
 	 * 
 	 * @param authorizationParameters
 	 *            the authorization parameters that need to be used while
-	 *            signing
+	 *            signing. The OAuth signature param will be added to this list
+	 *            of parameters
 	 * 
 	 */
 	public static void signRequest(WebRequest request, KeySecretPair keySecretPair, KeySecretPair userSecretPair, OAuthSignatureMethod oAuthSignatureMethod, WebForm authorizationParameters) {
@@ -107,23 +112,56 @@ public class OAuthUtils {
 		
 		// now build up the signing string
 		final String signable = builder.toString();
-		System.out.println("Signable string generated as: " + signable);
+		LOGGER.debug("Signable string generated as: {}", signable);
 		
 		// compute the signature
 		String signature = generateSignature(keySecretPair, userSecretPair, signable, OAuthSignatureMethod.HMAC_SHA1);
+		LOGGER.debug("Signature generated as: {}", signature);
+		
 		authorizationParameters.addParam(OAuthConstants.OAUTH_SIGNATURE, signature);
+	}
+	
+	/**
+	 * Build and Add an authorization header for the given request and the
+	 * {@link WebForm} parameters. The header name used is
+	 * {@link HttpHeaderName#AUTHORIZATION} and the prefix used is
+	 * {@link OAuthConstants#OAUTH_AUTHORIZATION_HEADER_PREFIX}.
+	 * 
+	 * @param request
+	 *            the request to which the authorization header is added.
+	 * 
+	 * @param webForm
+	 *            the form containing various parameters for authorization. Only
+	 *            the parameters starting with <code>oauth_</code> prefix are
+	 *            added to the header
+	 */
+	public static void buildAuthorizationHeader(WebRequest request,	WebForm webForm) {
+		OAuthUtils.buildAuthorizationHeader(request, webForm, HttpHeaderName.AUTHORIZATION, OAuthConstants.OAUTH_AUTHORIZATION_HEADER_PREFIX);
 	}
 
 	/**
-	 * Build an authorization header for the request.
+	 * Build and Add an authorization header for the given request and the
+	 * {@link WebForm} parameters. The header name used is
+	 * {@link HttpHeaderName#AUTHORIZATION} and the prefix used is
+	 * {@link OAuthConstants#OAUTH_AUTHORIZATION_HEADER_PREFIX}.
 	 * 
 	 * @param request
+	 *            the request to which the authorization header is added.
 	 * 
 	 * @param webForm
+	 *            the form containing various parameters for authorization. Only
+	 *            the parameters starting with <code>oauth_</code> prefix are
+	 *            added to the header
 	 * 
 	 * @param authorizationHeaderName
+	 *            the header name to be used.
 	 * 
 	 * @param authorizationHeaderPrefix
+	 *            the header value prefix to to be used
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the request, webForm, or authorizationHeaderName are null
+	 *             or empty
 	 */
 	public static void buildAuthorizationHeader(WebRequest request,	WebForm webForm, String authorizationHeaderName, String authorizationHeaderPrefix) {
 		if(request == null) {

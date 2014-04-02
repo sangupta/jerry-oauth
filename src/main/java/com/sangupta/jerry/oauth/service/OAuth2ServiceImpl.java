@@ -23,6 +23,7 @@ package com.sangupta.jerry.oauth.service;
 
 import org.apache.http.NameValuePair;
 
+import com.sangupta.jerry.http.HttpHeaderName;
 import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebInvoker;
 import com.sangupta.jerry.http.WebRequest;
@@ -61,10 +62,11 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 		return um.constructURL();
 	}
 	
-	public String getAuthorizationResponse(String code, String redirectURL) {
+	@Override
+	public String getAuthorizationResponse(String tokenCode, String verifier, String redirectURL) {
 		WebRequest request;
 		
-		WebForm webForm = WebForm.newForm().addParam("code", code)
+		WebForm webForm = WebForm.newForm().addParam("code", tokenCode)
 										   .addParam("client_id", this.keySecretPair.getKey())
 										   .addParam("client_secret", this.keySecretPair.getSecret())
 										   .addParam("redirect_uri", redirectURL);
@@ -95,14 +97,48 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 		return response.getContent();
 	}
 
+	/**
+	 * Sign this request with the provided access pair per the OAuth 2.0 specs.
+	 * 
+	 * @param request
+	 *            the {@link WebRequest} to be signed
+	 * 
+	 * @param accessPair
+	 *            the user-specific key pair to be used
+	 */
+	@Override
+	public void signRequest(WebRequest request, KeySecretPair accessPair) {
+		request.addHeader(HttpHeaderName.AUTHORIZATION, "Bearer " + accessPair.getKey());
+	}
+
 	protected abstract String getLoginEndPoint();
 	
 	protected abstract String getAuthorizationEndPoint();
 	
-	protected abstract WebRequestMethod getAuthorizationMethod();
+	/**
+	 * 
+	 * @return
+	 */
+	protected WebRequestMethod getAuthorizationMethod() {
+		return WebRequestMethod.GET;
+	}
 	
-	protected abstract void massageLoginURL(UrlManipulator manipulator);
+	/**
+	 * Massage the login URL for implementation specific properties.
+	 * 
+	 * @param manipulator
+	 */
+	protected void massageLoginURL(UrlManipulator manipulator) {
+		
+	}
 	
-	protected abstract void massageAuthorizationURL(WebForm webForm);
+	/**
+	 * Massage the authorization URL for implementation specific properties.
+	 * 
+	 * @param webForm
+	 */
+	protected void massageAuthorizationURL(WebForm webForm) {
+		
+	}
 
 }

@@ -21,6 +21,7 @@
 
 package com.sangupta.jerry.oauth.extractor;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,8 +34,19 @@ import java.util.Map;
  */
 public interface TokenExtractor {
 	
-	public static final Map<String, String> EMPTY_TOKEN_MAP = new HashMap<String, String>();
+	/**
+	 * An unmodifiable map that is always empty. Adding keys to the map will
+	 * result in an {@link UnsupportedOperationException}.
+	 */
+	public static final Map<String, String> EMPTY_TOKEN_MAP = Collections.unmodifiableMap(new HashMap<String, String>());
 	
+	/**
+	 * Extract the tokens from the given response and return them as a
+	 * {@link Map}.
+	 * 
+	 * @param webResponse
+	 * @return
+	 */
 	public Map<String, String> extractTokens(String webResponse);
 
 }

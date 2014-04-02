@@ -48,11 +48,31 @@ public interface OAuthService {
 	public String getLoginURL(String successUrl, String scope);
 	
 	/**
-	 * Sign the given request using the given access pair.
+	 * Return the authorization response for the given tokenCode and verifier as presented. The
+	 * tokenCode and verifier are provided by the authentication provider either in the redirected
+	 * request, or as a user-key-able token on the screen (used in desktop scenarios).
+	 * 
+	 * @param tokenCode
+	 * @param verifier
+	 * @param redirectURL
+	 * @return
+	 */
+	public String getAuthorizationResponse(String tokenCode, String verifier, String redirectURL);
+	
+	/**
+	 * Sign the given request using the given access pair. The access pair
+	 * provided here is the user specific key-pair. The application-specific key
+	 * pair must already have been provided when constructing an implementation
+	 * of the OAuth service.
 	 * 
 	 * @param request
-	 * @param accessPair
+	 *            the {@link WebRequest} that needs to be signed
+	 * 
+	 * @param userAccessPair
+	 *            the user specific key-pair to be used for signing. This can be
+	 *            <code>null</code> if the request has no user-specific token to
+	 *            be applied.
 	 */
-	public void signRequest(WebRequest request, KeySecretPair accessPair);
+	public void signRequest(WebRequest request, KeySecretPair userAccessPair);
 	
 }

@@ -105,13 +105,14 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	
 	/**
 	 * 
-	 * @param token
+	 * @param tokenCode
 	 * @param verifier
 	 * @param redirectURL
 	 * @return
 	 */
-	public String getAuthorizationResponse(String token, String verifier, String redirectURL) {
-		final KeySecretPair authTokenPair = new KeySecretPair(token, verifier);
+	@Override
+	public String getAuthorizationResponse(String tokenCode, String verifier, String redirectURL) {
+		final KeySecretPair authTokenPair = new KeySecretPair(tokenCode, verifier);
 		WebRequest request = WebInvoker.getWebRequest(getAuthorizationTokenURL(), getAuthorizationTokenMethod());
 		
 		request.bodyString("oauth_verifier=" + verifier, ContentType.APPLICATION_FORM_URLENCODED);
@@ -120,7 +121,7 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 				   .addParam(OAuthConstants.OAUTH_NONCE, NonceUtils.getUUIDNonce())
 				   .addParam(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
 				   .addParam(OAuthConstants.OAUTH_VERSION, getOAuthVersion())
-				   .addParam(OAuthConstants.OAUTH_TOKEN, token)
+				   .addParam(OAuthConstants.OAUTH_TOKEN, tokenCode)
 				   .addParam(OAuthConstants.OAUTH_SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
 
 		// generate the signature for the request
