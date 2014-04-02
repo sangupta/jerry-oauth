@@ -24,6 +24,8 @@ package com.sangupta.jerry.oauth.extractor;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.jcip.annotations.ThreadSafe;
+
 import com.sangupta.jerry.util.AssertUtils;
 
 /**
@@ -33,7 +35,14 @@ import com.sangupta.jerry.util.AssertUtils;
  * @author sangupta
  * @since 1.0
  */
+@ThreadSafe
 public class UrlParamExtractor implements TokenExtractor {
+	
+	/**
+	 * Global instance that classes can use rather than creating a new object
+	 * every time. The instance is thread-safe.
+	 */
+	public static final TokenExtractor INSTANCE = new UrlParamExtractor();
 
 	@Override
 	public Map<String, String> extractTokens(String webResponse) {

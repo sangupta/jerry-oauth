@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Contract for implementations that need to parse various
- * formats of tokens presented.
+ * Contract for implementations that need to parse various formats of tokens
+ * presented. Implementations must make sure that they are thread safe.
  * 
  * @author sangupta
  * @since 1.0

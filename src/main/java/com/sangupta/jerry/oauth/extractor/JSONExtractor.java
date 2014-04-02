@@ -23,6 +23,8 @@ package com.sangupta.jerry.oauth.extractor;
 
 import java.util.Map;
 
+import net.jcip.annotations.ThreadSafe;
+
 import com.sangupta.jerry.util.GsonUtils;
 
 /**
@@ -32,7 +34,14 @@ import com.sangupta.jerry.util.GsonUtils;
  * @author sangupta
  * @since 1.0
  */
+@ThreadSafe
 public class JSONExtractor implements TokenExtractor {
+	
+	/**
+	 * Global instance that classes can use rather than creating a new object
+	 * every time. The instance is thread-safe.
+	 */
+	public static final TokenExtractor INSTANCE = new JSONExtractor();
 
 	@Override
 	public Map<String, String> extractTokens(String webResponse) {
