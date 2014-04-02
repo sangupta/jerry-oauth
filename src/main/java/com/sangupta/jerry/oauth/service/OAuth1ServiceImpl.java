@@ -138,6 +138,10 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		System.out.println(response.trace());
 		System.out.println(response.getContent());
 		
+		if(!response.isSuccess()) {
+			return null;
+		}
+		
 		return response.getContent();
 	}
 	
