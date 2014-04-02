@@ -200,36 +200,6 @@ public class OAuthUtils {
 		request.addHeader(authorizationHeaderName, builder.toString());
 	}
 
-//	public static WebRequest signRequest(WebRequest request, KeySecretPair consumer, KeySecretPair userToken, String timeStamp, String nonce) {
-//		StringBuilder builder = new StringBuilder();
-//		
-//		// first the HTTP VERB
-//		builder.append(request.getVerb().toString().toUpperCase());
-//		builder.append("&");
-//		
-//		// then the end point without any path or query or fragment
-//		URI uri = request.getURI();
-//		builder.append(getSignableBase(uri));
-//		
-//		// collect all parameters
-//		TreeMap<String, String> requestParams = extractURIParameters(uri);
-//		String paramString = buildParamString(null, requestParams);
-//		
-//		// now build up the signing string
-//		final String signable = builder.toString();
-//		
-//		// compute the signature
-//		final String signature = generateSignature(consumer, userToken, signable, OAuthSignatureMethod.HMAC_SHA1);
-//		
-//		// append to the request
-////		params.put(OAuthConstants.OAUTH_SIGNATURE, signature);
-////		
-////		// build oauth header
-////		request.addHeader(HttpHeaderName.AUTHORIZATION, "OAuth " + getAllOAuthParams(params));
-//		
-//		return request;
-//	}
-	
 	/**
 	 * Given a list of parameters (including the OAuth parameters) build the
 	 * unique parameter string that is used to generate the signable string.
@@ -547,21 +517,28 @@ public class OAuthUtils {
 	/**
 	 * Generate an OAUTH signature for the given signature string.
 	 * 
-	 * @param consumerKey
-	 * 
 	 * @param consumerSecret
+	 *            the consumer or application specific secret to use
+	 * 
+	 * @param tokenSecret
+	 *            the user specific secret to use
 	 * 
 	 * @param signable
+	 *            the string to be signed
 	 * 
-	 * @return
+	 * @param signingMethod
+	 *            the signing method to use
+	 * 
+	 * @return the signature generated, or <code>null</code> if some exception
+	 *         occurs
+	 * 
+	 * @throws NullPointerException
+	 *             if the signable string is <code>null</code>/empty; or, if the
+	 *             consumer secret is <code>null</code>/empty.
 	 */
 	public static String generateSignature(String consumerSecret, String tokenSecret, String signable, OAuthSignatureMethod signingMethod) {
 		if(AssertUtils.isEmpty(consumerSecret)) {
-			throw new IllegalArgumentException("Signature string cannot be null/empty");
-		}
-		
-		if(AssertUtils.isEmpty(signable)) {
-			throw new IllegalArgumentException("Signable string cannot be null/empty");
+			throw new IllegalArgumentException("Consumer secret cannot be null/empty");
 		}
 		
 		final String signingKey;
@@ -575,15 +552,30 @@ public class OAuthUtils {
 	}
 	
 	/**
-	 * Generate the signature using the given signing method for the signable using the key string. For OAuth the key
-	 * string should already be URI-percent-encoded if need be.
+	 * Generate the signature using the given signing method for the signable
+	 * using the key string. For OAuth the key string should already be
+	 * URI-percent-encoded if need be.
 	 * 
-	 * @param toSign
+	 * @param signable
+	 *            the string for which the signature needs to be generated
+	 * 
 	 * @param keyString
-	 * @param method
-	 * @return
+	 *            the key string to be used
+	 * 
+	 * @param signingMethod
+	 *            the signing method to be used
+	 * 
+	 * @return the signature generated, or <code>null</code> if some exception
+	 *         occurs
+	 * 
+	 * @throws NullPointerException
+	 *             if the signable string is <code>null</code>/empty.
 	 */
 	public static String createSignature(String signable, String keyString, OAuthSignatureMethod signingMethod) {
+		if(AssertUtils.isEmpty(signable)) {
+			throw new IllegalArgumentException("Signable string cannot be null/empty");
+		}
+		
 		SecretKeySpec key = new SecretKeySpec((keyString).getBytes(StringUtils.CHARSET_UTF8), signingMethod.getAlgorithmName());
 		Mac mac;
 		try {
@@ -601,13 +593,22 @@ public class OAuthUtils {
 	}
 
 	/**
-	 * Generate a sorted parameter string for the given parameters.
-	 * 
+	 * Generate a sorted parameter string for the given parameters. All
+	 * parameters are appended into a string form.
 	 * 
 	 * @param params
-	 * @return
+	 *            the request parameters that need to be appended
+	 * 
+	 * @param encodeParamValues
+	 *            whether to URL encode the parameters or not
+	 * 
+	 * @return the URL query string representation of all parameters
 	 */
 	public static String generateParamString(TreeMap<String, String> params, boolean encodeParamValues) {
+		if(AssertUtils.isEmpty(params)) {
+			return StringUtils.EMPTY_STRING;
+		}
+		
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
 		
