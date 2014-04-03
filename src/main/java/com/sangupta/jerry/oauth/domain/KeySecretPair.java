@@ -60,6 +60,37 @@ public class KeySecretPair {
 		this.secret = secret;
 	}
 	
+	@Override
+	public int hashCode() {
+		if(this.key == null || this.secret == null) {
+			return -1;
+		}
+		
+		return this.key.hashCode() * 37 + this.secret.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == null) {
+			return false;
+		}
+		
+		if(this == obj) {
+			return true;
+		}
+		
+		if(this.key == null || this.secret == null) {
+			return false;
+		}
+		
+		if(!(obj instanceof KeySecretPair)) {
+			return false;
+		}
+		
+		KeySecretPair pair = (KeySecretPair) obj;
+		return this.key.equals(pair.key) && this.secret.equals(pair.secret);
+	}
+	
 	/**
 	 * Utility method to generate a new {@link KeySecretPair} using {@link UUID}
 	 * values as both key and secret.

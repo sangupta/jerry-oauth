@@ -29,6 +29,7 @@ import com.sangupta.jerry.oauth.service.OAuth1ServiceImpl;
 import com.sangupta.jerry.util.AssertUtils;
 
 /**
+ * OAuth implementation for http://twitter.com
  * 
  * @author sangupta
  * @since 1.0

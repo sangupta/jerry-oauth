@@ -29,6 +29,7 @@ import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.jerry.util.UrlManipulator;
 
 /**
+ * OAuth implementation for http://google.com
  * 
  * @author sangupta
  * @since 1.0

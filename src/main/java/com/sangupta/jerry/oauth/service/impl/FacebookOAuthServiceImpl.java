@@ -25,6 +25,7 @@ import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.service.OAuth2ServiceImpl;
 
 /**
+ * OAuth implementation for http://facebook.com
  * 
  * @author sangupta
  * @since 1.0
