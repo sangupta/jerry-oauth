@@ -24,6 +24,8 @@ package com.sangupta.jerry.oauth.service;
 import java.util.Map;
 
 import org.apache.http.entity.ContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sangupta.jerry.http.HttpHeaderName;
 import com.sangupta.jerry.http.WebForm;
@@ -46,6 +48,8 @@ import com.sangupta.jerry.oauth.nonce.NonceUtils;
  * @since 1.0
  */
 public abstract class OAuth1ServiceImpl implements OAuthService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(OAuth1ServiceImpl.class);
 	
 	/**
 	 * The app specific key secret pair to be used
@@ -93,8 +97,15 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		
 		// hit the request for request token
 		WebResponse response = WebInvoker.executeSilently(request);
-		if(response == null || !response.isSuccess()) {
+		if(response == null) {
+			LOGGER.error("Null response for request token API call");
 			return null;
+		}
+		
+		if(!response.isSuccess()) {
+			LOGGER.debug("Unsuccessful call to request token API: {}", response.trace());
+			LOGGER.debug("Response body: {}", response.getContent());
+			return response.getContent();
 		}
 		
 		Map<String, String> params = getRequestTokenExtractor().extractTokens(response.getContent());
@@ -130,17 +141,21 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		// sign the request with the details
 		OAuthUtils.buildAuthorizationHeader(request, webForm, getAuthorizationHeaderName(), getAuthorizationHeaderPrefix());
 		
+		if(LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Making authorization call to: {}", request.trace());
+		}
+		
 		// hit the request for request token
 		WebResponse response = WebInvoker.executeSilently(request);
 		if(response == null) {
+			LOGGER.error("Null response for request token API call");
 			return null;
 		}
 		
-		System.out.println(response.trace());
-		System.out.println(response.getContent());
-		
 		if(!response.isSuccess()) {
-			return null;
+			LOGGER.debug("Unsuccessful call to request token API: {}", response.trace());
+			LOGGER.debug("Response body: {}", response.getContent());
+			return response.getContent();
 		}
 		
 		return response.getContent();

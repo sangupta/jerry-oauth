@@ -28,9 +28,11 @@ import net.jcip.annotations.ThreadSafe;
 import com.sangupta.jerry.util.GsonUtils;
 
 /**
- * Parses the the JSON input and returns a {@link Map} with keys as the
- * field name and the values, as field values.
- *  
+ * Parses the the JSON input and returns a {@link Map} with keys as the field
+ * name and the values, as field values. Callee's should usually NOT create a
+ * new instance of this class, but use the global static singleton instance
+ * {@link JSONExtractor#INSTANCE} for usage.
+ * 
  * @author sangupta
  * @since 1.0
  */

@@ -29,8 +29,10 @@ import net.jcip.annotations.ThreadSafe;
 import com.sangupta.jerry.util.AssertUtils;
 
 /**
- * A {@link TokenExtractor} implementation that takes in URL-encoded
- * parameter string and parses to extract token parameters.
+ * A {@link TokenExtractor} implementation that takes in URL-encoded parameter
+ * string and parses to extract token parameters. Callee's should usually NOT
+ * create a new instance of this class, but use the global static singleton
+ * instance {@link UrlParamExtractor#INSTANCE} for usage.
  * 
  * @author sangupta
  * @since 1.0

@@ -22,6 +22,8 @@
 package com.sangupta.jerry.oauth.service;
 
 import org.apache.http.NameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sangupta.jerry.http.HttpHeaderName;
 import com.sangupta.jerry.http.WebForm;
@@ -40,6 +42,8 @@ import com.sangupta.jerry.util.UrlManipulator;
  * @since 1.0
  */
 public abstract class OAuth2ServiceImpl implements OAuthService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(OAuth1ServiceImpl.class);
 	
 	protected final KeySecretPair keySecretPair;
 	
@@ -86,11 +90,19 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 			request = WebInvoker.getWebRequest(manipulator.constructURL(), getAuthorizationMethod());
 		}
 		
+		if(LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Making authorization call to: {}", request.trace());
+		}
+		
 		WebResponse response = WebInvoker.executeSilently(request);
-		if(response == null || !response.isSuccess()) {
-			System.out.println("null or error response");
-			System.out.println(response.trace());
-			System.out.println(response.getContent());
+		if(response == null) {
+			LOGGER.error("Null response for authorization API call");
+			return null;
+		}
+		
+		if(!response.isSuccess()) {
+			LOGGER.debug("Unsuccessful call to authorization API: {}", response.trace());
+			LOGGER.debug("Response body: {}", response.getContent());
 			return null;
 		}
 		
@@ -114,6 +126,10 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 	protected abstract String getLoginEndPoint();
 	
 	protected abstract String getAuthorizationEndPoint();
+	
+	protected String getLoginEndPointRequestType() {
+		return "code";
+	}
 	
 	/**
 	 * 
