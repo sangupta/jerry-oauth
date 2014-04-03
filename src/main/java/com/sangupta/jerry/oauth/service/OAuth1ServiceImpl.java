@@ -23,7 +23,7 @@ package com.sangupta.jerry.oauth.service;
 
 import java.util.Map;
 
-import org.apache.http.entity.ContentType;
+import org.apache.http.NameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +37,11 @@ import com.sangupta.jerry.oauth.OAuthUtils;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureMethod;
+import com.sangupta.jerry.oauth.domain.OAuthSignatureType;
 import com.sangupta.jerry.oauth.extractor.TokenExtractor;
 import com.sangupta.jerry.oauth.extractor.UrlParamExtractor;
 import com.sangupta.jerry.oauth.nonce.NonceUtils;
+import com.sangupta.jerry.util.UrlManipulator;
 
 /**
  * Base implementation for all clients that support the OAuth 1.0 specifications.
@@ -80,11 +82,11 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	public final String getLoginURL(String successUrl, String scope) {
 		WebRequest request = WebInvoker.getWebRequest(getRequestTokenURL(), getRequestTokenMethod());
 		
-		WebForm webForm = WebForm.newForm().addParam(OAuthConstants.OAUTH_CONSUMER_KEY, this.keySecretPair.getKey())
-										   .addParam(OAuthConstants.OAUTH_NONCE, NonceUtils.getUUIDNonce())
-										   .addParam(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
-										   .addParam(OAuthConstants.OAUTH_VERSION, getOAuthVersion())
-										   .addParam(OAuthConstants.OAUTH_SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
+		WebForm webForm = WebForm.newForm().addParam(OAuthConstants.CONSUMER_KEY, this.keySecretPair.getKey())
+										   .addParam(OAuthConstants.NONCE, NonceUtils.getNonce())
+										   .addParam(OAuthConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
+										   .addParam(OAuthConstants.VERSION, getOAuthVersion())
+										   .addParam(OAuthConstants.SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
 		
 		// add custom parameters if they need to be added
 		massageTokenRequestHeader(webForm, successUrl, scope);
@@ -105,7 +107,7 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		if(!response.isSuccess()) {
 			LOGGER.debug("Unsuccessful call to request token API: {}", response.trace());
 			LOGGER.debug("Response body: {}", response.getContent());
-			return response.getContent();
+			return null;
 		}
 		
 		Map<String, String> params = getRequestTokenExtractor().extractTokens(response.getContent());
@@ -126,20 +128,37 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		final KeySecretPair authTokenPair = new KeySecretPair(tokenCode, verifier);
 		WebRequest request = WebInvoker.getWebRequest(getAuthorizationTokenURL(), getAuthorizationTokenMethod());
 		
-		request.bodyString("oauth_verifier=" + verifier, ContentType.APPLICATION_FORM_URLENCODED);
-		
-		WebForm webForm = WebForm.newForm().addParam(OAuthConstants.OAUTH_CONSUMER_KEY, this.keySecretPair.getKey())
-				   .addParam(OAuthConstants.OAUTH_NONCE, NonceUtils.getUUIDNonce())
-				   .addParam(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
-				   .addParam(OAuthConstants.OAUTH_VERSION, getOAuthVersion())
-				   .addParam(OAuthConstants.OAUTH_TOKEN, tokenCode)
-				   .addParam(OAuthConstants.OAUTH_SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
+		WebForm webForm = WebForm.newForm().addParam(OAuthConstants.CONSUMER_KEY, this.keySecretPair.getKey())
+				   .addParam(OAuthConstants.NONCE, NonceUtils.getNonce())
+				   .addParam(OAuthConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
+				   .addParam(OAuthConstants.VERSION, getOAuthVersion())
+				   .addParam(OAuthConstants.TOKEN, tokenCode)
+				   .addParam(OAuthConstants.SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
 
+		massageAuthorizationRequest(request, webForm, authTokenPair);
+		
 		// generate the signature for the request
 		OAuthUtils.signRequest(request, this.keySecretPair, authTokenPair, getOAuthSignatureMethod(), webForm);
 		
 		// sign the request with the details
-		OAuthUtils.buildAuthorizationHeader(request, webForm, getAuthorizationHeaderName(), getAuthorizationHeaderPrefix());
+		switch(getOAuthSignatureType()) {
+			
+			case HEADER:
+				OAuthUtils.buildAuthorizationHeader(request, webForm, getAuthorizationHeaderName(), getAuthorizationHeaderPrefix());
+				break;
+				
+			case QUERY_PARAMS:
+				UrlManipulator manipulator = new UrlManipulator(getAuthorizationTokenURL());
+				for(NameValuePair pair : webForm.build()) {
+					manipulator.setQueryParam(pair.getName(), pair.getValue());
+				}
+				
+				request = WebInvoker.getWebRequest(manipulator.constructURL(), getAuthorizationTokenMethod());
+				break;
+				
+			default:
+				throw new AssertionError("Missing case statement for enumeration!");
+		}
 		
 		if(LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Making authorization call to: {}", request.trace());
@@ -155,12 +174,22 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		if(!response.isSuccess()) {
 			LOGGER.debug("Unsuccessful call to request token API: {}", response.trace());
 			LOGGER.debug("Response body: {}", response.getContent());
-			return response.getContent();
+			return null;
 		}
 		
 		return response.getContent();
 	}
 	
+	/**
+	 * 
+	 * @param request
+	 * @param webForm
+	 * @param authTokenPair 
+	 */
+	protected void massageAuthorizationRequest(WebRequest request, WebForm webForm, KeySecretPair authTokenPair) {
+		// intentionally left blank
+	}
+
 	/**
 	 * Specify the token extractor to be used after the request token API
 	 * has been successfully called. Default is to use the {@link UrlParamExtractor}.
@@ -190,16 +219,25 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	protected void massageTokenRequestHeader(WebForm webForm, String successUrl, String scope) {
 		
 	}
+	
+	/**
+	 * Return the type of signature that needs to be applied to the request.
+	 * 
+	 * @return
+	 */
+	protected OAuthSignatureType getOAuthSignatureType() {
+		return OAuthSignatureType.HEADER;
+	}
 
 	/**
 	 * The version number to be used in the OAuth header. The default value
-	 * is {@link OAuthConstants#OAUTH_VERSION_1_0}. Implementations may override
+	 * is {@link OAuthConstants#VERSION_1_0}. Implementations may override
 	 * this value in case they need to pass something else.
 	 * 
 	 * @return
 	 */
 	protected String getOAuthVersion() {
-		return OAuthConstants.OAUTH_VERSION_1_0;
+		return OAuthConstants.VERSION_1_0;
 	}
 	
 	/**

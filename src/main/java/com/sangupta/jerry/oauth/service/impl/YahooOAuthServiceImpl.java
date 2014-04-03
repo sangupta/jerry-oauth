@@ -23,8 +23,10 @@ package com.sangupta.jerry.oauth.service.impl;
 
 import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebRequest;
+import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
+import com.sangupta.jerry.oauth.domain.OAuthSignatureType;
 import com.sangupta.jerry.oauth.service.OAuth1ServiceImpl;
 import com.sangupta.jerry.util.AssertUtils;
 
@@ -55,16 +57,31 @@ public class YahooOAuthServiceImpl extends OAuth1ServiceImpl {
 		return "https://api.login.yahoo.com/oauth/v2/request_auth";
 	}
 	
+	@Override
+	protected WebRequestMethod getAuthorizationTokenMethod() {
+		return WebRequestMethod.GET;
+	}
+	
 	protected String getAuthorizationTokenURL() {
 		return "https://api.login.yahoo.com/oauth/v2/get_token";
 	}
 
 	protected void massageTokenRequestHeader(WebForm webForm, String successUrl, String scope) {
 		if(AssertUtils.isNotEmpty(successUrl)) {
-			webForm.addParam("oauth_callback", successUrl);
+			webForm.addParam(OAuthConstants.CALLBACK, successUrl);
 		}
 		
-		webForm.addParam(OAuthConstants.OAUTH_TOKEN, "");
+		webForm.addParam(OAuthConstants.TOKEN, "");
 	}
-
+	
+	@Override
+	protected void massageAuthorizationRequest(WebRequest request, WebForm webForm, KeySecretPair authTokenPair) {
+		webForm.addParam(OAuthConstants.VERIFIER, authTokenPair.getSecret());
+	}
+	
+	@Override
+	protected OAuthSignatureType getOAuthSignatureType() {
+		return OAuthSignatureType.QUERY_PARAMS;
+	}
+	
 }

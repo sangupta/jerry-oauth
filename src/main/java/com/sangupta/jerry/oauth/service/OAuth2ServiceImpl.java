@@ -54,10 +54,10 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 	@Override
 	public String getLoginURL(String successUrl, String scope) {
 		UrlManipulator um = new UrlManipulator(getLoginEndPoint());
-		um.setQueryParam(OAuthConstants.OAUTH_SCOPE, scope);
-		um.setQueryParam(OAuthConstants.OAUTH_CLIENT_ID, this.keySecretPair.getKey());
+		um.setQueryParam(OAuthConstants.SCOPE, scope);
+		um.setQueryParam(OAuthConstants.CLIENT_ID, this.keySecretPair.getKey());
 		um.setQueryParam("response_type", "code");
-		um.setQueryParam(OAuthConstants.OAUTH_REDIRECT_URI, successUrl);
+		um.setQueryParam(OAuthConstants.REDIRECT_URI, successUrl);
 
 		// massage login to add parameters specific to implementation
 		massageLoginURL(um);

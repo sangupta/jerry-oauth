@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sangupta.jerry.encoder.Base64Encoder;
+import com.sangupta.jerry.exceptions.NotImplementedException;
 import com.sangupta.jerry.http.HttpHeaderName;
 import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebInvoker;
@@ -118,7 +119,33 @@ public class OAuthUtils {
 		String signature = generateSignature(keySecretPair, userSecretPair, signable, OAuthSignatureMethod.HMAC_SHA1);
 		LOGGER.debug("Signature generated as: {}", signature);
 		
-		authorizationParameters.addParam(OAuthConstants.OAUTH_SIGNATURE, signature);
+		authorizationParameters.addParam(OAuthConstants.SIGNATURE, signature);
+	}
+	
+	/**
+	 * Build authorization parameters as request query params.
+	 * 
+	 * @param request
+	 *            the request to which the authorization header is added.
+	 * 
+	 * @param webForm
+	 *            the form containing various parameters for authorization. Only
+	 *            the parameters starting with <code>oauth_</code> prefix are
+	 *            added to the header
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the request, or webForm is <code>null</code>
+	 */
+	public static void buildAuthorizationQuery(WebRequest request, WebForm webForm) {
+		if(request == null) {
+			throw new IllegalArgumentException("WebRequest to sign cannot be null");
+		}
+		
+		if(webForm == null) {
+			throw new IllegalArgumentException("WebForm containing signing parameters cannot be null");
+		}
+		
+		throw new NotImplementedException();
 	}
 	
 	/**
@@ -352,11 +379,11 @@ public class OAuthUtils {
 		builder.append(UriUtils.encodeURIComponent(endPoint, true));
 		
 		TreeMap<String, String> params = new TreeMap<String, String>();
-		params.put(OAuthConstants.OAUTH_CONSUMER_KEY, consumerKey);
-		params.put(OAuthConstants.OAUTH_NONCE, NonceUtils.getNonce());
-		params.put(OAuthConstants.OAUTH_SIGNATURE_METHOD, signatureMethod.getOauthName());
-		params.put(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis()));
-		params.put(OAuthConstants.OAUTH_VERSION, oAuthVersion);
+		params.put(OAuthConstants.CONSUMER_KEY, consumerKey);
+		params.put(OAuthConstants.NONCE, NonceUtils.getNonce());
+		params.put(OAuthConstants.SIGNATURE_METHOD, signatureMethod.getOauthName());
+		params.put(OAuthConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
+		params.put(OAuthConstants.VERSION, oAuthVersion);
 
 		if(AssertUtils.isNotEmpty(requestParams)) {
 			for(Entry<String, String> entry : requestParams.entrySet()) {
@@ -372,7 +399,7 @@ public class OAuthUtils {
 		System.out.println("Signable: " + builder.toString());
 		
 		String signature = generateSignature(consumerSecret, "", builder.toString(), signatureMethod);
-		params.put(OAuthConstants.OAUTH_SIGNATURE, signature);
+		params.put(OAuthConstants.SIGNATURE, signature);
 		
 		// build oauth header
 		WebRequest request = WebInvoker.getWebRequest(endPoint, method);
@@ -409,12 +436,12 @@ public class OAuthUtils {
 		builder.append(UriUtils.encodeURIComponent(endPoint, true));
 		
 		TreeMap<String, String> params = new TreeMap<String, String>();
-		params.put(OAuthConstants.OAUTH_CONSUMER_KEY, consumerKey);
-		params.put(OAuthConstants.OAUTH_NONCE, NonceUtils.getNonce());
-		params.put(OAuthConstants.OAUTH_SIGNATURE_METHOD, signatureMethod.getOauthName());
-		params.put(OAuthConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis()));
-		params.put(OAuthConstants.OAUTH_VERSION, oAuthVersion);
-		params.put(OAuthConstants.OAUTH_TOKEN, tokenKey);
+		params.put(OAuthConstants.CONSUMER_KEY, consumerKey);
+		params.put(OAuthConstants.NONCE, NonceUtils.getNonce());
+		params.put(OAuthConstants.SIGNATURE_METHOD, signatureMethod.getOauthName());
+		params.put(OAuthConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
+		params.put(OAuthConstants.VERSION, oAuthVersion);
+		params.put(OAuthConstants.TOKEN, tokenKey);
 
 		if(AssertUtils.isNotEmpty(requestParams)) {
 			for(Entry<String, String> entry : requestParams.entrySet()) {
@@ -430,7 +457,7 @@ public class OAuthUtils {
 		System.out.println("Signable: " + builder.toString());
 		
 		String signature = generateSignature(consumerSecret, tokenSecret, builder.toString(), signatureMethod);
-		params.put(OAuthConstants.OAUTH_SIGNATURE, signature);
+		params.put(OAuthConstants.SIGNATURE, signature);
 		
 		// build oauth header
 		WebRequest request = WebInvoker.getWebRequest(endPoint, method);
@@ -574,6 +601,10 @@ public class OAuthUtils {
 	public static String createSignature(String signable, String keyString, OAuthSignatureMethod signingMethod) {
 		if(AssertUtils.isEmpty(signable)) {
 			throw new IllegalArgumentException("Signable string cannot be null/empty");
+		}
+		
+		if(signingMethod == OAuthSignatureMethod.PLAIN_TEXT) {
+			return keyString;
 		}
 		
 		SecretKeySpec key = new SecretKeySpec((keyString).getBytes(StringUtils.CHARSET_UTF8), signingMethod.getAlgorithmName());

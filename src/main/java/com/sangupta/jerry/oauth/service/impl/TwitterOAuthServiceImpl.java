@@ -21,6 +21,8 @@
 
 package com.sangupta.jerry.oauth.service.impl;
 
+import org.apache.http.entity.ContentType;
+
 import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
@@ -61,9 +63,14 @@ public class TwitterOAuthServiceImpl extends OAuth1ServiceImpl {
 
 	protected void massageTokenRequestHeader(WebForm webForm, String successUrl, String scope) {
 		if(AssertUtils.isNotEmpty(successUrl)) {
-			webForm.addParam("oauth_callback", successUrl);
+			webForm.addParam(OAuthConstants.CALLBACK, successUrl);
 		}
-		webForm.addParam(OAuthConstants.OAUTH_TOKEN, "");
+		webForm.addParam(OAuthConstants.TOKEN, "");
 	}
 
+	@Override
+	protected void massageAuthorizationRequest(WebRequest request, WebForm webForm, KeySecretPair authTokenPair) {
+		request.bodyString(OAuthConstants.VERIFIER + "=" + authTokenPair.getSecret(), ContentType.APPLICATION_FORM_URLENCODED);
+	}
+	
 }

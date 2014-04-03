@@ -29,21 +29,21 @@ package com.sangupta.jerry.oauth.domain;
  */
 public interface OAuthConstants {
 	
-	public static final String OAUTH_SIGNATURE = "oauth_signature";
+	public static final String SIGNATURE = "oauth_signature";
 	
-	public static final String OAUTH_CONSUMER_KEY = "oauth_consumer_key";
+	public static final String CONSUMER_KEY = "oauth_consumer_key";
 	
-	public static final String OAUTH_TOKEN = "oauth_token";
+	public static final String TOKEN = "oauth_token";
 	
-	public static final String OAUTH_SIGNATURE_METHOD = "oauth_signature_method";
+	public static final String SIGNATURE_METHOD = "oauth_signature_method";
 	
-	public static final String OAUTH_TIMESTAMP = "oauth_timestamp";
+	public static final String TIMESTAMP = "oauth_timestamp";
 	
-	public static final String OAUTH_NONCE = "oauth_nonce";
+	public static final String NONCE = "oauth_nonce";
 	
-	public static final String OAUTH_VERSION = "oauth_version";
+	public static final String VERSION = "oauth_version";
 	
-	public static final String OAUTH_VERSION_1_0 = "1.0";
+	public static final String VERSION_1_0 = "1.0";
 	
 	public static final String OAUTH_AUTHORIZATION_HEADER_PREFIX = "OAuth";
 	
@@ -59,18 +59,24 @@ public interface OAuthConstants {
 
 	// OAuth 2.0
 	
-	public static final String OAUTH_VERSION_2_0 = "1.0";
+	public static final String VERSION_2_0 = "1.0";
 
-	public static final String OAUTH_ACCESS_TOKEN = "access_token";
+	public static final String ACCESS_TOKEN = "access_token";
 
-	public static final String OAUTH_CLIENT_ID = "client_id";
+	public static final String CLIENT_ID = "client_id";
 	
-	public static final String OAUTH_CLIENT_SECRET = "client_secret";
+	public static final String CLIENT_SECRET = "client_secret";
 
-	public static final String OAUTH_REDIRECT_URI = "redirect_uri";
+	public static final String REDIRECT_URI = "redirect_uri";
 
-	public static final String OAUTH_CODE = "code";
+	public static final String CODE = "code";
 	
-	public static final String OAUTH_SCOPE = "scope";
-
+	public static final String SCOPE = "scope";
+	
+	public static final String OUT_OF_BAND = "oob";
+	
+	public static final String VERIFIER = "oauth_verifier";
+	
+	public static final String CALLBACK = "oauth_callback";
+	
 }

@@ -35,7 +35,12 @@ public enum OAuthSignatureMethod {
 	/**
 	 * HMAC-SHA1 
 	 */
-	HMAC_SHA1("HMAC-SHA1", "HmacSHA1");
+	HMAC_SHA1("HMAC-SHA1", "HmacSHA1"),
+	
+	/**
+	 * Plain text implementation
+	 */
+	PLAIN_TEXT("PLAINTEXT", "PLAINTEXT");
 	
 	/**
 	 * The name to be sent to the OAuth server
