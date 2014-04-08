@@ -106,7 +106,9 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 			return null;
 		}
 		
-		return response.getContent();
+		String content = response.getContent();
+		LOGGER.debug("Authorization response: {}", content);
+		return content;
 	}
 
 	/**
