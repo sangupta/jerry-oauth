@@ -51,6 +51,9 @@ import com.sangupta.jerry.util.UrlManipulator;
  */
 public abstract class OAuth1ServiceImpl implements OAuthService {
 	
+	/**
+	 * My logger instance
+	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(OAuth1ServiceImpl.class);
 	
 	/**
@@ -116,6 +119,29 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		return this.getAuthenticationURL() + "?oauth_token=" + tokenPair.getKey();
 	}
 	
+	@Override
+	public void signRequest(WebRequest request, KeySecretPair userAccessPair) {
+		if(request == null) {
+			throw new IllegalArgumentException("WebRequest to be signed cannot be null");
+		}
+		
+		WebForm webForm = WebForm.newForm().addParam(OAuthConstants.CONSUMER_KEY, this.keySecretPair.getKey())
+				   .addParam(OAuthConstants.NONCE, NonceUtils.getNonce())
+				   .addParam(OAuthConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
+				   .addParam(OAuthConstants.VERSION, getOAuthVersion())
+				   .addParam(OAuthConstants.SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
+		
+		if(userAccessPair != null) {
+			webForm.addParam(OAuthConstants.TOKEN, userAccessPair.getKey());
+		}
+		
+		// generate the signature for the request
+		OAuthUtils.signRequest(request, this.keySecretPair, userAccessPair, getOAuthSignatureMethod(), webForm);
+
+		// sign the request with the details
+		OAuthUtils.buildAuthorizationHeader(request, webForm, getAuthorizationHeaderName(), getAuthorizationHeaderPrefix());
+	}
+	
 	/**
 	 * 
 	 * @param tokenCode
@@ -177,7 +203,9 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 			return null;
 		}
 		
-		return response.getContent();
+		String content = response.getContent();
+		LOGGER.debug("Response content as: {}", content);
+		return content;
 	}
 	
 	/**

@@ -43,11 +43,6 @@ public class TwitterOAuthServiceImpl extends OAuth1ServiceImpl {
 	}
 
 	@Override
-	public void signRequest(WebRequest request, KeySecretPair accessPair) {
-		
-	}
-
-	@Override
 	protected String getRequestTokenURL() {
 		return "https://api.twitter.com/oauth/request_token";
 	}
@@ -65,6 +60,7 @@ public class TwitterOAuthServiceImpl extends OAuth1ServiceImpl {
 		if(AssertUtils.isNotEmpty(successUrl)) {
 			webForm.addParam(OAuthConstants.CALLBACK, successUrl);
 		}
+		
 		webForm.addParam(OAuthConstants.TOKEN, "");
 	}
 

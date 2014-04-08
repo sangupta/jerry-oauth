@@ -396,7 +396,7 @@ public class OAuthUtils {
 		builder.append("&");
 		builder.append(UriUtils.encodeURIComponent(paramString, true));
 		
-		System.out.println("Signable: " + builder.toString());
+		LOGGER.debug("Signable: {}", builder.toString());
 		
 		String signature = generateSignature(consumerSecret, "", builder.toString(), signatureMethod);
 		params.put(OAuthConstants.SIGNATURE, signature);
@@ -454,7 +454,7 @@ public class OAuthUtils {
 		builder.append("&");
 		builder.append(UriUtils.encodeURIComponent(paramString, true));
 		
-		System.out.println("Signable: " + builder.toString());
+		LOGGER.debug("Signable: {}", builder.toString());
 		
 		String signature = generateSignature(consumerSecret, tokenSecret, builder.toString(), signatureMethod);
 		params.put(OAuthConstants.SIGNATURE, signature);
