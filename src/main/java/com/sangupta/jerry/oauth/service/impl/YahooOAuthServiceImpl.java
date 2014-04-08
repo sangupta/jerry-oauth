@@ -43,11 +43,6 @@ public class YahooOAuthServiceImpl extends OAuth1ServiceImpl {
 	}
 
 	@Override
-	public void signRequest(WebRequest request, KeySecretPair accessPair) {
-		
-	}
-
-	@Override
 	protected String getRequestTokenURL() {
 		return "https://api.login.yahoo.com/oauth/v2/get_request_token";
 	}
