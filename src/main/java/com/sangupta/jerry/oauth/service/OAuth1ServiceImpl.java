@@ -164,12 +164,12 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 				   .addParam(OAuthConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
 				   .addParam(OAuthConstants.VERSION, getOAuthVersion())
 				   .addParam(OAuthConstants.TOKEN, tokenAndUrl.token.getKey())
-				   .addParam(OAuthConstants.SIGNATURE_METHOD, OAuthSignatureMethod.PLAIN_TEXT.getOAuthName());
+				   .addParam(OAuthConstants.SIGNATURE_METHOD, getOAuthSignatureMethod().getOAuthName());
 
 		massageAuthorizationRequest(request, webForm, tokenAndUrl, verifier);
 		
 		// generate the signature for the request
-		OAuthUtils.signRequest(request, this.keySecretPair, tokenAndUrl.token, OAuthSignatureMethod.PLAIN_TEXT, webForm);
+		OAuthUtils.signRequest(request, this.keySecretPair, tokenAndUrl.token, getOAuthSignatureMethod(), webForm);
 		
 		// sign the request with the details
 		switch(getOAuthSignatureType()) {
