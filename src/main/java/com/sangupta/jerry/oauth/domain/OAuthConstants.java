@@ -79,4 +79,8 @@ public interface OAuthConstants {
 	
 	public static final String CALLBACK = "oauth_callback";
 	
+	public static final String GRANT_TYPE = "grant_type";
+	
+	public static final String GRANT_AUTHORIZATION_CODE = "authorization_code";
+	
 }

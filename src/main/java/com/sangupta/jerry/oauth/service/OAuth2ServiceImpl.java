@@ -111,6 +111,11 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 		return content;
 	}
 
+	@Override
+	public String signRequestUrl(String url, KeySecretPair userAccessPair) {
+		return url;
+	}
+	
 	/**
 	 * Sign this request with the provided access pair per the OAuth 2.0 specs.
 	 * 

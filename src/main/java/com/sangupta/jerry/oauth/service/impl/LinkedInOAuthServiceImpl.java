@@ -21,8 +21,13 @@
 
 package com.sangupta.jerry.oauth.service.impl;
 
+import com.sangupta.jerry.http.WebForm;
+import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
+import com.sangupta.jerry.oauth.domain.OAuthConstants;
+import com.sangupta.jerry.oauth.nonce.NonceUtils;
 import com.sangupta.jerry.oauth.service.OAuth2ServiceImpl;
+import com.sangupta.jerry.util.UrlManipulator;
 
 /**
  * OAuth implementation for http://linkedin.com
@@ -40,10 +45,25 @@ public class LinkedInOAuthServiceImpl extends OAuth2ServiceImpl {
 	protected String getLoginEndPoint() {
 		return "https://www.linkedin.com/uas/oauth2/authorization";
 	}
+	
+	@Override
+	protected void massageLoginURL(UrlManipulator manipulator) {
+		manipulator.setQueryParam("state", NonceUtils.getNonce());
+	}
+	
+	@Override
+	protected WebRequestMethod getAuthorizationMethod() {
+		return WebRequestMethod.GET;
+	}
 
 	@Override
 	protected String getAuthorizationEndPoint() {
 		return "https://www.linkedin.com/uas/oauth2/accessToken";
+	}
+	
+	@Override
+	protected void massageAuthorizationURL(WebForm webForm) {
+		webForm.addParam(OAuthConstants.GRANT_TYPE, OAuthConstants.GRANT_AUTHORIZATION_CODE);
 	}
 
 }

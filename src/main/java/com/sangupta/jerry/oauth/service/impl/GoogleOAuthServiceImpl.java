@@ -24,6 +24,7 @@ package com.sangupta.jerry.oauth.service.impl;
 import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
+import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.service.OAuth2ServiceImpl;
 import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.jerry.util.UrlManipulator;
@@ -74,7 +75,7 @@ public class GoogleOAuthServiceImpl extends OAuth2ServiceImpl {
 
 	@Override
 	protected void massageAuthorizationURL(WebForm webForm) {
-		webForm.addParam("grant_type", "authorization_code");
+		webForm.addParam(OAuthConstants.GRANT_TYPE, OAuthConstants.GRANT_AUTHORIZATION_CODE);
 	}
 	
 }

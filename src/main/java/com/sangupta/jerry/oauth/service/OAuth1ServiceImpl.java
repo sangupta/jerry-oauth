@@ -39,7 +39,7 @@ import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureMethod;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureType;
 import com.sangupta.jerry.oauth.extractor.TokenExtractor;
-import com.sangupta.jerry.oauth.extractor.UrlParamExtractor;
+import com.sangupta.jerry.oauth.extractor.UrlParamTokenExtractor;
 import com.sangupta.jerry.oauth.nonce.NonceUtils;
 import com.sangupta.jerry.util.UrlManipulator;
 
@@ -117,6 +117,11 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		KeySecretPair tokenPair = new KeySecretPair(params.get("oauth_token"), params.get("oauth_token_secret"));
 		
 		return this.getAuthenticationURL() + "?oauth_token=" + tokenPair.getKey();
+	}
+	
+	@Override
+	public String signRequestUrl(String url, KeySecretPair userAccessPair) {
+		return url;
 	}
 	
 	@Override
@@ -220,14 +225,14 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 
 	/**
 	 * Specify the token extractor to be used after the request token API
-	 * has been successfully called. Default is to use the {@link UrlParamExtractor}.
+	 * has been successfully called. Default is to use the {@link UrlParamTokenExtractor}.
 	 * Implementation may override the function if they wish to choose
 	 * another {@link TokenExtractor} implementation.
 	 * 
 	 * @return
 	 */
 	protected TokenExtractor getRequestTokenExtractor() {
-		return new UrlParamExtractor();
+		return new UrlParamTokenExtractor();
 	}
 
 	/**

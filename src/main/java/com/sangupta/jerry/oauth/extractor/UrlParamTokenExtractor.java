@@ -21,34 +21,45 @@
 
 package com.sangupta.jerry.oauth.extractor;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import net.jcip.annotations.ThreadSafe;
 
-import com.sangupta.jerry.util.GsonUtils;
+import com.sangupta.jerry.util.AssertUtils;
 
 /**
- * Parses the the JSON input and returns a {@link Map} with keys as the field
- * name and the values, as field values. Callee's should usually NOT create a
- * new instance of this class, but use the global static singleton instance
- * {@link JSONExtractor#INSTANCE} for usage.
+ * A {@link TokenExtractor} implementation that takes in URL-encoded parameter
+ * string and parses to extract token parameters. Callee's should usually NOT
+ * create a new instance of this class, but use the global static singleton
+ * instance {@link UrlParamTokenExtractor#INSTANCE} for usage.
  * 
  * @author sangupta
  * @since 1.0
  */
 @ThreadSafe
-public class JSONExtractor implements TokenExtractor {
+public class UrlParamTokenExtractor implements TokenExtractor {
 	
 	/**
 	 * Global instance that classes can use rather than creating a new object
 	 * every time. The instance is thread-safe.
 	 */
-	public static final TokenExtractor INSTANCE = new JSONExtractor();
+	public static final TokenExtractor INSTANCE = new UrlParamTokenExtractor();
 
 	@Override
 	public Map<String, String> extractTokens(String webResponse) {
-		@SuppressWarnings("unchecked")
-		Map<String, String> map = GsonUtils.getGson().fromJson(webResponse, Map.class);
+		if(AssertUtils.isEmpty(webResponse)) {
+			return TokenExtractor.EMPTY_TOKEN_MAP;
+		}
+		
+		Map<String, String> map = new HashMap<String, String>();
+		String[] tokens = webResponse.split("&");
+		for(String token : tokens) {
+			String[] pair = token.split("=");
+			if(pair.length == 2) {
+				map.put(pair[0], pair[1]);
+			}
+		}
 		
 		return map;
 	}

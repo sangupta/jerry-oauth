@@ -21,6 +21,7 @@
 
 package com.sangupta.jerry.oauth.service;
 
+import com.sangupta.jerry.http.HttpHeaderName;
 import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 
@@ -58,6 +59,18 @@ public interface OAuthService {
 	 * @return
 	 */
 	public String getAuthorizationResponse(String tokenCode, String verifier, String redirectURL);
+	
+	/**
+	 * Sign the given request URL using the given user access pair. This is
+	 * useful where access token needs to be passed as a request parameter, than
+	 * request headers. Some stupid folks like at Microsoft do it - rather than
+	 * accepting a {@link HttpHeaderName#AUTHORIZATION} header.
+	 * 
+	 * @param url
+	 * @param userAccessPair
+	 * @return
+	 */
+	public String signRequestUrl(String url, KeySecretPair userAccessPair);
 	
 	/**
 	 * Sign the given request using the given access pair. The access pair
