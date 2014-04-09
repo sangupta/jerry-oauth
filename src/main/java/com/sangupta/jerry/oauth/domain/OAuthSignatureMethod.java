@@ -69,7 +69,7 @@ public enum OAuthSignatureMethod {
 	 * 
 	 * @return
 	 */
-	public String getOauthName() {
+	public String getOAuthName() {
 		return oauthName;
 	}
 

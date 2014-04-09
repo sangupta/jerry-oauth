@@ -22,6 +22,7 @@
 package com.sangupta.jerry.oauth.service.impl;
 
 import com.sangupta.jerry.http.WebForm;
+import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
@@ -64,6 +65,18 @@ public class LinkedInOAuthServiceImpl extends OAuth2ServiceImpl {
 	@Override
 	protected void massageAuthorizationURL(WebForm webForm) {
 		webForm.addParam(OAuthConstants.GRANT_TYPE, OAuthConstants.GRANT_AUTHORIZATION_CODE);
+	}
+	
+	@Override
+	public String signRequestUrl(String url, KeySecretPair userAccessPair) {
+		UrlManipulator manipulator = new UrlManipulator(url);
+		manipulator.setQueryParam("oauth2_access_token", userAccessPair.getKey());
+		return manipulator.constructURL();
+	}
+	
+	@Override
+	public void signRequest(WebRequest request, KeySecretPair accessPair) {
+		// do nothing
 	}
 
 }

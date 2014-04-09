@@ -24,6 +24,7 @@ package com.sangupta.jerry.oauth.service;
 import com.sangupta.jerry.http.HttpHeaderName;
 import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
+import com.sangupta.jerry.oauth.domain.TokenAndUrl;
 
 /**
  * Base contract for all OAuth based services: 1.0, 2.0 or hybrid. Decouples
@@ -46,7 +47,7 @@ public interface OAuthService {
 	 * @return the login url to which the user should be redirected
 	 * 
 	 */
-	public String getLoginURL(String successUrl, String scope);
+	public TokenAndUrl getLoginURL(String successUrl, String scope);
 	
 	/**
 	 * Return the authorization response for the given tokenCode and verifier as presented. The
@@ -58,7 +59,7 @@ public interface OAuthService {
 	 * @param redirectURL
 	 * @return
 	 */
-	public String getAuthorizationResponse(String tokenCode, String verifier, String redirectURL);
+	public String getAuthorizationResponse(TokenAndUrl tokenAndUrl, String verifier);
 	
 	/**
 	 * Sign the given request URL using the given user access pair. This is

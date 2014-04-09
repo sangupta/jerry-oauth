@@ -27,6 +27,7 @@ import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureType;
+import com.sangupta.jerry.oauth.domain.TokenAndUrl;
 import com.sangupta.jerry.oauth.service.OAuth1ServiceImpl;
 import com.sangupta.jerry.util.AssertUtils;
 
@@ -53,14 +54,6 @@ public class YahooOAuthServiceImpl extends OAuth1ServiceImpl {
 	}
 	
 	@Override
-	protected WebRequestMethod getAuthorizationTokenMethod() {
-		return WebRequestMethod.GET;
-	}
-	
-	protected String getAuthorizationTokenURL() {
-		return "https://api.login.yahoo.com/oauth/v2/get_token";
-	}
-
 	protected void massageTokenRequestHeader(WebForm webForm, String successUrl, String scope) {
 		if(AssertUtils.isNotEmpty(successUrl)) {
 			webForm.addParam(OAuthConstants.CALLBACK, successUrl);
@@ -70,8 +63,18 @@ public class YahooOAuthServiceImpl extends OAuth1ServiceImpl {
 	}
 	
 	@Override
-	protected void massageAuthorizationRequest(WebRequest request, WebForm webForm, KeySecretPair authTokenPair) {
-		webForm.addParam(OAuthConstants.VERIFIER, authTokenPair.getSecret());
+	protected WebRequestMethod getAuthorizationTokenMethod() {
+		return WebRequestMethod.POST;
+	}
+	
+	@Override
+	protected String getAuthorizationTokenURL() {
+		return "https://api.login.yahoo.com/oauth/v2/get_token";
+	}
+
+	@Override
+	protected void massageAuthorizationRequest(WebRequest request, WebForm webForm, TokenAndUrl tokenAndUrl, String verifier) {
+		webForm.addParam(OAuthConstants.VERIFIER, verifier);
 	}
 	
 	@Override

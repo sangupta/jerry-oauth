@@ -116,7 +116,7 @@ public class OAuthUtils {
 		LOGGER.debug("Signable string generated as: {}", signable);
 		
 		// compute the signature
-		String signature = generateSignature(keySecretPair, userSecretPair, signable, OAuthSignatureMethod.HMAC_SHA1);
+		String signature = generateSignature(keySecretPair, userSecretPair, signable, oAuthSignatureMethod);
 		LOGGER.debug("Signature generated as: {}", signature);
 		
 		authorizationParameters.addParam(OAuthConstants.SIGNATURE, signature);
@@ -381,7 +381,7 @@ public class OAuthUtils {
 		TreeMap<String, String> params = new TreeMap<String, String>();
 		params.put(OAuthConstants.CONSUMER_KEY, consumerKey);
 		params.put(OAuthConstants.NONCE, NonceUtils.getNonce());
-		params.put(OAuthConstants.SIGNATURE_METHOD, signatureMethod.getOauthName());
+		params.put(OAuthConstants.SIGNATURE_METHOD, signatureMethod.getOAuthName());
 		params.put(OAuthConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
 		params.put(OAuthConstants.VERSION, oAuthVersion);
 
@@ -438,7 +438,7 @@ public class OAuthUtils {
 		TreeMap<String, String> params = new TreeMap<String, String>();
 		params.put(OAuthConstants.CONSUMER_KEY, consumerKey);
 		params.put(OAuthConstants.NONCE, NonceUtils.getNonce());
-		params.put(OAuthConstants.SIGNATURE_METHOD, signatureMethod.getOauthName());
+		params.put(OAuthConstants.SIGNATURE_METHOD, signatureMethod.getOAuthName());
 		params.put(OAuthConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
 		params.put(OAuthConstants.VERSION, oAuthVersion);
 		params.put(OAuthConstants.TOKEN, tokenKey);

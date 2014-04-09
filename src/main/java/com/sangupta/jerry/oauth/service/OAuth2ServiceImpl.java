@@ -33,6 +33,7 @@ import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.http.WebResponse;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
+import com.sangupta.jerry.oauth.domain.TokenAndUrl;
 import com.sangupta.jerry.util.UrlManipulator;
 
 /**
@@ -52,7 +53,7 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 	}
 	
 	@Override
-	public String getLoginURL(String successUrl, String scope) {
+	public TokenAndUrl getLoginURL(String successUrl, String scope) {
 		UrlManipulator um = new UrlManipulator(getLoginEndPoint());
 		um.setQueryParam(OAuthConstants.SCOPE, scope);
 		um.setQueryParam(OAuthConstants.CLIENT_ID, this.keySecretPair.getKey());
@@ -63,17 +64,17 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 		massageLoginURL(um);
 		
 		// return the constructed url
-		return um.constructURL();
+		return new TokenAndUrl(um.constructURL(), successUrl);
 	}
 	
 	@Override
-	public String getAuthorizationResponse(String tokenCode, String verifier, String redirectURL) {
+	public String getAuthorizationResponse(TokenAndUrl tokenAndUrl, String verifier) {
 		WebRequest request;
 		
-		WebForm webForm = WebForm.newForm().addParam("code", tokenCode)
+		WebForm webForm = WebForm.newForm().addParam("code", verifier)
 										   .addParam("client_id", this.keySecretPair.getKey())
 										   .addParam("client_secret", this.keySecretPair.getSecret())
-										   .addParam("redirect_uri", redirectURL);
+										   .addParam("redirect_uri", tokenAndUrl.callbackURL);
 		
 		massageAuthorizationURL(webForm);
 

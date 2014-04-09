@@ -38,6 +38,7 @@ import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureMethod;
 import com.sangupta.jerry.oauth.domain.OAuthSignatureType;
+import com.sangupta.jerry.oauth.domain.TokenAndUrl;
 import com.sangupta.jerry.oauth.extractor.TokenExtractor;
 import com.sangupta.jerry.oauth.extractor.UrlParamTokenExtractor;
 import com.sangupta.jerry.oauth.nonce.NonceUtils;
@@ -82,14 +83,14 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	 * 
 	 */
 	@Override
-	public final String getLoginURL(String successUrl, String scope) {
+	public final TokenAndUrl getLoginURL(String successUrl, String scope) {
 		WebRequest request = WebInvoker.getWebRequest(getRequestTokenURL(), getRequestTokenMethod());
 		
 		WebForm webForm = WebForm.newForm().addParam(OAuthConstants.CONSUMER_KEY, this.keySecretPair.getKey())
 										   .addParam(OAuthConstants.NONCE, NonceUtils.getNonce())
 										   .addParam(OAuthConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
 										   .addParam(OAuthConstants.VERSION, getOAuthVersion())
-										   .addParam(OAuthConstants.SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
+										   .addParam(OAuthConstants.SIGNATURE_METHOD, getOAuthSignatureMethod().getOAuthName());
 		
 		// add custom parameters if they need to be added
 		massageTokenRequestHeader(webForm, successUrl, scope);
@@ -116,7 +117,7 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		Map<String, String> params = getRequestTokenExtractor().extractTokens(response.getContent());
 		KeySecretPair tokenPair = new KeySecretPair(params.get("oauth_token"), params.get("oauth_token_secret"));
 		
-		return this.getAuthenticationURL() + "?oauth_token=" + tokenPair.getKey();
+		return new TokenAndUrl(this.getAuthenticationURL() + "?oauth_token=" + tokenPair.getKey(), successUrl, tokenPair);
 	}
 	
 	@Override
@@ -134,7 +135,7 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 				   .addParam(OAuthConstants.NONCE, NonceUtils.getNonce())
 				   .addParam(OAuthConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
 				   .addParam(OAuthConstants.VERSION, getOAuthVersion())
-				   .addParam(OAuthConstants.SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
+				   .addParam(OAuthConstants.SIGNATURE_METHOD, getOAuthSignatureMethod().getOAuthName());
 		
 		if(userAccessPair != null) {
 			webForm.addParam(OAuthConstants.TOKEN, userAccessPair.getKey());
@@ -155,21 +156,20 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	 * @return
 	 */
 	@Override
-	public String getAuthorizationResponse(String tokenCode, String verifier, String redirectURL) {
-		final KeySecretPair authTokenPair = new KeySecretPair(tokenCode, verifier);
+	public String getAuthorizationResponse(TokenAndUrl tokenAndUrl, String verifier) {
 		WebRequest request = WebInvoker.getWebRequest(getAuthorizationTokenURL(), getAuthorizationTokenMethod());
 		
 		WebForm webForm = WebForm.newForm().addParam(OAuthConstants.CONSUMER_KEY, this.keySecretPair.getKey())
 				   .addParam(OAuthConstants.NONCE, NonceUtils.getNonce())
 				   .addParam(OAuthConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis() /1000l))
 				   .addParam(OAuthConstants.VERSION, getOAuthVersion())
-				   .addParam(OAuthConstants.TOKEN, tokenCode)
-				   .addParam(OAuthConstants.SIGNATURE_METHOD, getOAuthSignatureMethod().getOauthName());
+				   .addParam(OAuthConstants.TOKEN, tokenAndUrl.token.getKey())
+				   .addParam(OAuthConstants.SIGNATURE_METHOD, OAuthSignatureMethod.PLAIN_TEXT.getOAuthName());
 
-		massageAuthorizationRequest(request, webForm, authTokenPair);
+		massageAuthorizationRequest(request, webForm, tokenAndUrl, verifier);
 		
 		// generate the signature for the request
-		OAuthUtils.signRequest(request, this.keySecretPair, authTokenPair, getOAuthSignatureMethod(), webForm);
+		OAuthUtils.signRequest(request, this.keySecretPair, tokenAndUrl.token, OAuthSignatureMethod.PLAIN_TEXT, webForm);
 		
 		// sign the request with the details
 		switch(getOAuthSignatureType()) {
@@ -219,7 +219,7 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 	 * @param webForm
 	 * @param authTokenPair 
 	 */
-	protected void massageAuthorizationRequest(WebRequest request, WebForm webForm, KeySecretPair authTokenPair) {
+	protected void massageAuthorizationRequest(WebRequest request, WebForm webForm, TokenAndUrl tokenAndUrl, String verifier) {
 		// intentionally left blank
 	}
 

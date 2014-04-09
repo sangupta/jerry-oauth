@@ -27,6 +27,7 @@ import com.sangupta.jerry.http.WebForm;
 import com.sangupta.jerry.http.WebRequest;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
+import com.sangupta.jerry.oauth.domain.TokenAndUrl;
 import com.sangupta.jerry.oauth.service.OAuth1ServiceImpl;
 import com.sangupta.jerry.util.AssertUtils;
 
@@ -65,8 +66,8 @@ public class TwitterOAuthServiceImpl extends OAuth1ServiceImpl {
 	}
 
 	@Override
-	protected void massageAuthorizationRequest(WebRequest request, WebForm webForm, KeySecretPair authTokenPair) {
-		request.bodyString(OAuthConstants.VERIFIER + "=" + authTokenPair.getSecret(), ContentType.APPLICATION_FORM_URLENCODED);
+	protected void massageAuthorizationRequest(WebRequest request, WebForm webForm, TokenAndUrl tokenAndUrl, String verifier) {
+		request.bodyString(OAuthConstants.VERIFIER + "=" + verifier, ContentType.APPLICATION_FORM_URLENCODED);
 	}
 	
 }
