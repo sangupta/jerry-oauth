@@ -35,6 +35,8 @@ public interface OAuthConstants {
 	
 	public static final String TOKEN = "oauth_token";
 	
+	public static final String TOKEN_SECRET = "oauth_token_secret";
+	
 	public static final String SIGNATURE_METHOD = "oauth_signature_method";
 	
 	public static final String TIMESTAMP = "oauth_timestamp";
@@ -82,5 +84,7 @@ public interface OAuthConstants {
 	public static final String GRANT_TYPE = "grant_type";
 	
 	public static final String GRANT_AUTHORIZATION_CODE = "authorization_code";
+	
+	public static final String REFRESH_TOKEN = "refresh_token";
 	
 }

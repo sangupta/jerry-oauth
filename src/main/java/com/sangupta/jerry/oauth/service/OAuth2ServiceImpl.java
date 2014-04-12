@@ -34,6 +34,7 @@ import com.sangupta.jerry.http.WebResponse;
 import com.sangupta.jerry.oauth.domain.KeySecretPair;
 import com.sangupta.jerry.oauth.domain.OAuthConstants;
 import com.sangupta.jerry.oauth.domain.TokenAndUrl;
+import com.sangupta.jerry.util.StringUtils;
 import com.sangupta.jerry.util.UrlManipulator;
 
 /**
@@ -50,6 +51,22 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 	
 	protected OAuth2ServiceImpl(KeySecretPair keySecretPair) {
 		this.keySecretPair = keySecretPair;
+	}
+	
+	public String getAccessTokenParamName() {
+		return OAuthConstants.ACCESS_TOKEN;
+	}
+	
+	public String getAccessTokenSecretParamName() {
+		return StringUtils.EMPTY_STRING;
+	}
+	
+	public String getRefreshTokenParamName() {
+		return OAuthConstants.REFRESH_TOKEN;
+	}
+	
+	public String getAccessTokenExpiryParamName() {
+		return null;
 	}
 	
 	@Override

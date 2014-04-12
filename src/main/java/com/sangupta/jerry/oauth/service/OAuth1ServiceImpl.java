@@ -72,6 +72,22 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		this.keySecretPair = applicationKeySecretPair;
 	}
 	
+	public String getAccessTokenParamName() {
+		return OAuthConstants.TOKEN;
+	}
+	
+	public String getAccessTokenSecretParamName() {
+		return OAuthConstants.TOKEN_SECRET;
+	}
+	
+	public String getRefreshTokenParamName() {
+		return null;
+	}
+	
+	public String getAccessTokenExpiryParamName() {
+		return null;
+	}
+	
 	/**
 	 * Obtain the sign-in URL for the user - this is a two step process.
 	 * In first step, we obtain the request token ourselves from the site

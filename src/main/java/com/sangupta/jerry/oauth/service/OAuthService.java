@@ -89,4 +89,12 @@ public interface OAuthService {
 	 */
 	public void signRequest(WebRequest request, KeySecretPair userAccessPair);
 	
+	public String getAccessTokenParamName();
+	
+	public String getAccessTokenSecretParamName();
+	
+	public String getRefreshTokenParamName();
+	
+	public String getAccessTokenExpiryParamName();
+	
 }
