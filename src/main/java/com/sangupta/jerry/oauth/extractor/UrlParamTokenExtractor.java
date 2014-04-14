@@ -27,6 +27,7 @@ import java.util.Map;
 import net.jcip.annotations.ThreadSafe;
 
 import com.sangupta.jerry.util.AssertUtils;
+import com.sangupta.jerry.util.UriUtils;
 
 /**
  * A {@link TokenExtractor} implementation that takes in URL-encoded parameter
@@ -57,7 +58,7 @@ public class UrlParamTokenExtractor implements TokenExtractor {
 		for(String token : tokens) {
 			String[] pair = token.split("=");
 			if(pair.length == 2) {
-				map.put(pair[0], pair[1]);
+				map.put(pair[0], UriUtils.decodeURIComponent(pair[1]));
 			}
 		}
 		

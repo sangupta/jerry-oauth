@@ -157,13 +157,24 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 			webForm.addParam(OAuthConstants.TOKEN, userAccessPair.getKey());
 		}
 		
+		addCustomOAuthParamsDuringSigning(webForm);
+		
 		// generate the signature for the request
 		OAuthUtils.signRequest(request, this.keySecretPair, userAccessPair, getOAuthSignatureMethod(), webForm);
-
+		
 		// sign the request with the details
 		OAuthUtils.buildAuthorizationHeader(request, webForm, getAuthorizationHeaderName(), getAuthorizationHeaderPrefix());
 	}
-	
+
+	/**
+	 * Add custom OAuth parameters during the signing phase.
+	 * 
+	 * @param webForm
+	 */
+	protected void addCustomOAuthParamsDuringSigning(WebForm webForm) {
+		
+	}
+
 	/**
 	 * 
 	 * @param tokenCode

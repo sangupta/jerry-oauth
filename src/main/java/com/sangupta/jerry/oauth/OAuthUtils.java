@@ -66,7 +66,7 @@ public class OAuthUtils {
 	 * Logger to be used
 	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(OAuthUtils.class);
-
+	
 	/**
 	 * Sign the given {@link WebRequest} with the given application
 	 * {@link KeySecretPair} and user's {@link KeySecretPair}. The signature
@@ -224,7 +224,9 @@ public class OAuthUtils {
 			builder.append("\"");
 		}
 		
-		request.addHeader(authorizationHeaderName, builder.toString());
+		String headerValue = builder.toString();
+		LOGGER.debug("OAuth header built as: {}: {}", authorizationHeaderName, headerValue);
+		request.addHeader(authorizationHeaderName, headerValue);
 	}
 
 	/**
@@ -234,17 +236,19 @@ public class OAuthUtils {
 	 * @param params
 	 *            the request parameters if any
 	 * 
-	 * @param webForm
+	 * @param oauthParams
 	 *            the OAuth params
 	 * 
 	 * @return the parameters string to be used to generate the signable string
 	 */
-	public static String buildParamString(TreeMap<String, String> params, WebForm webForm) {
+	public static String buildParamString(TreeMap<String, String> params, WebForm oauthParams) {
 		StringBuilder builder = new StringBuilder(1024);
 		
 		// add all to the list of params
-		for(NameValuePair pair : webForm.build()) {
-			params.put(pair.getName(), pair.getValue());
+		for(NameValuePair pair : oauthParams.build()) {
+			if(pair.getName().startsWith("oauth_")) {
+				params.put(pair.getName(), pair.getValue());
+			}
 		}
 		
 		// build the string
