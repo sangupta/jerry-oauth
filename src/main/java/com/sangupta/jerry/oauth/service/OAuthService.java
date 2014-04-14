@@ -97,4 +97,6 @@ public interface OAuthService {
 	
 	public String getAccessTokenExpiryParamName();
 	
+	public String getVerificationCodeParamName();
+	
 }

@@ -370,4 +370,12 @@ public abstract class OAuth1ServiceImpl implements OAuthService {
 		return OAuthConstants.OAUTH_AUTHORIZATION_HEADER_PREFIX;
 	}
 	
+	/**
+	 * @see com.sangupta.jerry.oauth.service.OAuthService#getVerificationCodeParamName()
+	 */
+	@Override
+	public String getVerificationCodeParamName() {
+		return "oauth_verifier";
+	}
+	
 }

@@ -182,4 +182,12 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 		
 	}
 
+	/**
+	 * @see com.sangupta.jerry.oauth.service.OAuthService#getVerificationCodeParamName()
+	 */
+	@Override
+	public String getVerificationCodeParamName() {
+		return "oauth_verifier";
+	}
+	
 }
