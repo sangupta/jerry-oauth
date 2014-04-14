@@ -46,4 +46,11 @@ public class FacebookOAuthServiceImpl extends OAuth2ServiceImpl {
 		return "https://graph.facebook.com/oauth/access_token";
 	}
 
+	/**
+	 * @see com.sangupta.jerry.oauth.service.OAuth2ServiceImpl#getVerificationCodeParamName()
+	 */
+	@Override
+	public String getVerificationCodeParamName() {
+		return "code";
+	}
 }
