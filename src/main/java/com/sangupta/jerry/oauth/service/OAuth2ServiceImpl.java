@@ -187,7 +187,7 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 	 */
 	@Override
 	public String getVerificationCodeParamName() {
-		return "oauth_verifier";
+		return "code";
 	}
 	
 }
