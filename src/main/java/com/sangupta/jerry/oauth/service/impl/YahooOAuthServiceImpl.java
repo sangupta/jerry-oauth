@@ -82,9 +82,4 @@ public class YahooOAuthServiceImpl extends OAuth1ServiceImpl {
 		return OAuthSignatureType.QUERY_PARAMS;
 	}
 	
-	@Override
-	protected void addCustomOAuthParamsDuringSigning(WebForm webForm) {
-		webForm.addParam("realm", "https://social.yahooapis.com/");
-	}
-
 }
