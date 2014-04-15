@@ -9,12 +9,19 @@ nonce etc, and also implementations for a nonce server, oauth token server etc.
 
 For more information on the project, refer to https://github.com/sangupta/jerry project.
 
-#### NOTE: Still under development and not production ready
-
 Releases
 --------
 
 **Current Development**
+
+**0.9.0**
+
+* Implementations for Yahoo, GitHub, DropBox, LinkedIn, MicrosoftLive added
+* Updated social network scope constants to include the entire list
+* Abstracted verification code param name in OAuth services
+* Changed getLoginURL() return type from String to TokenAndUrl - thus clients need not keep track of what is to be used and what not
+* Decode url parameters in UrlParamTokenExtractor
+* Other bug fixes and refactorings
 
 **0.1.0**
 
@@ -34,7 +41,7 @@ The library can be downloaded from Maven Central using:
 <dependency>
     <groupId>com.sangupta</groupId>
     <artifactId>jerry-oauth</artifactId>
-    <version>0.1.0</version>
+    <version>0.9.0</version>
 </dependency>
 ```
 
