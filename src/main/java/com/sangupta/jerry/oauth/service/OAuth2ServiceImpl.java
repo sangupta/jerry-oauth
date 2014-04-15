@@ -45,30 +45,71 @@ import com.sangupta.jerry.util.UrlManipulator;
  */
 public abstract class OAuth2ServiceImpl implements OAuthService {
 	
+	/**
+	 * My logger instance
+	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(OAuth1ServiceImpl.class);
 	
+	/**
+	 * The application specific {@link KeySecretPair} being stored
+	 */
 	protected final KeySecretPair keySecretPair;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param keySecretPair
+	 *            the application level key secret pair that needs to be used
+	 */
 	protected OAuth2ServiceImpl(KeySecretPair keySecretPair) {
+		if(keySecretPair == null) {
+			throw new IllegalArgumentException("Cannot construct OAuth2 with a null key-secret pair");
+		}
+		
 		this.keySecretPair = keySecretPair;
 	}
 	
+	/**
+	 * Return the name of the Access token parameter name
+	 * 
+	 */
+	@Override
 	public String getAccessTokenParamName() {
 		return OAuthConstants.ACCESS_TOKEN;
 	}
 	
+	/**
+	 * Return the name of access token secret parameter name
+	 * 
+	 */
+	@Override
 	public String getAccessTokenSecretParamName() {
 		return StringUtils.EMPTY_STRING;
 	}
 	
+	/**
+	 * Return the name of the refresh token parameter name
+	 * 
+	 */
+	@Override
 	public String getRefreshTokenParamName() {
 		return OAuthConstants.REFRESH_TOKEN;
 	}
 	
+	/**
+	 * Return the name of the access token expiry parameter name
+	 * 
+	 */
+	@Override
 	public String getAccessTokenExpiryParamName() {
 		return null;
 	}
 	
+	/**
+	 * Return the login URL to be used for authenticating a user
+	 * 
+	 * @return a {@link TokenAndUrl} implementation with the login redirect url
+	 */
 	@Override
 	public TokenAndUrl getLoginURL(String successUrl, String scope) {
 		UrlManipulator um = new UrlManipulator(getLoginEndPoint());
@@ -157,8 +198,10 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 	}
 	
 	/**
+	 * Return the HTTP VERB to be used for authorization of call. The default
+	 * value is {@link WebRequestMethod#GET}
 	 * 
-	 * @return
+	 * @return the HTTP VERB to be used
 	 */
 	protected WebRequestMethod getAuthorizationMethod() {
 		return WebRequestMethod.GET;
@@ -168,6 +211,9 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 	 * Massage the login URL for implementation specific properties.
 	 * 
 	 * @param manipulator
+	 *            the {@link UrlManipulator} that is used to create the login
+	 *            URL
+	 * 
 	 */
 	protected void massageLoginURL(UrlManipulator manipulator) {
 		
@@ -177,12 +223,17 @@ public abstract class OAuth2ServiceImpl implements OAuthService {
 	 * Massage the authorization URL for implementation specific properties.
 	 * 
 	 * @param webForm
+	 *            the {@link WebForm} containing all the authorization
+	 *            parameters
 	 */
 	protected void massageAuthorizationURL(WebForm webForm) {
 		
 	}
 
 	/**
+	 * Return the name of the verification parameter that contains the final
+	 * verification code
+	 * 
 	 * @see com.sangupta.jerry.oauth.service.OAuthService#getVerificationCodeParamName()
 	 */
 	@Override

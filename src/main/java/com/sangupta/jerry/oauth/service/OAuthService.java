@@ -50,14 +50,20 @@ public interface OAuthService {
 	public TokenAndUrl getLoginURL(String successUrl, String scope);
 	
 	/**
-	 * Return the authorization response for the given tokenCode and verifier as presented. The
-	 * tokenCode and verifier are provided by the authentication provider either in the redirected
-	 * request, or as a user-key-able token on the screen (used in desktop scenarios).
+	 * Return the authorization response for the given tokenCode and verifier as
+	 * presented. The tokenCode and verifier are provided by the authentication
+	 * provider either in the redirected request, or as a user-key-able token on
+	 * the screen (used in desktop scenarios).
 	 * 
-	 * @param tokenCode
+	 * @param tokenAndUrl
+	 *            the {@link TokenAndUrl} instance that was supplied during
+	 *            login URL creation
+	 * 
 	 * @param verifier
-	 * @param redirectURL
-	 * @return
+	 *            the verifier code that was sent back from the server
+	 * 
+	 * @return the {@link String} representation of the web response received as
+	 *         part of the authorization call
 	 */
 	public String getAuthorizationResponse(TokenAndUrl tokenAndUrl, String verifier);
 	
@@ -68,8 +74,13 @@ public interface OAuthService {
 	 * accepting a {@link HttpHeaderName#AUTHORIZATION} header.
 	 * 
 	 * @param url
+	 *            the URL that needs to be signed, to which request parameters
+	 *            should be added
+	 * 
 	 * @param userAccessPair
-	 * @return
+	 *            the user-specific {@link KeySecretPair}
+	 * 
+	 * @return the signed-URL
 	 */
 	public String signRequestUrl(String url, KeySecretPair userAccessPair);
 	

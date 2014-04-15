@@ -334,12 +334,17 @@ public class OAuthUtils {
 	}
 	
 	/**
-	 * Return the signing base URL that is appended after the HTTP VERB
-	 * in OAuth header.
+	 * Return the signing base URL that is appended after the HTTP VERB in OAuth
+	 * header.
 	 * 
 	 * @param url
-	 * @return
+	 *            the {@link String} based URL from which the signing base URL
+	 *            is extracted
+	 * 
+	 * @return the signing base extracted from the URL
+	 * 
 	 * @throws URISyntaxException
+	 *             if the URL is malformed
 	 */
 	public static String getSigningBaseURL(String url) throws URISyntaxException {
 		if(AssertUtils.isEmpty(url)) {
@@ -350,11 +355,14 @@ public class OAuthUtils {
 	}
 	
 	/**
-	 * Return the signing base URL that is appended after the HTTP VERB
-	 * in OAuth header.
+	 * Return the signing base URL that is appended after the HTTP VERB in OAuth
+	 * header.
 	 * 
 	 * @param uri
-	 * @return
+	 *            the {@link URI} instance from which the signing base is
+	 *            extracted
+	 * 
+	 * @return the extracted signing base from the {@link URI} instance
 	 */
 	public static String getSigningBaseURL(URI uri) {
 		if(uri == null) {

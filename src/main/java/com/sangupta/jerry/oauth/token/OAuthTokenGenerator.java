@@ -33,22 +33,29 @@ import com.sangupta.jerry.oauth.domain.KeySecretPair;
 public interface OAuthTokenGenerator {
 	
 	/**
-	 * For the given consumer key, generate a new OAuth token pair
-	 * that needs to be sent to the client.
+	 * For the given consumer key, generate a new OAuth token pair that needs to
+	 * be sent to the client.
 	 * 
 	 * @param consumerKey
-	 * @return
+	 *            the consumer key that needs to be mapped to the generated pair
+	 * 
+	 * @return the generated {@link KeySecretPair}
 	 */
 	public KeySecretPair generateKeyPair(String consumerKey);
 	
 	/**
-	 * Return the token secret for the given consumer key and access token.
-	 * The method should return a <code>null</code> if any of the consumer
-	 * key or the request token do not match.
+	 * Return the token secret for the given consumer key and access token. The
+	 * method should return a <code>null</code> if any of the consumer key or
+	 * the request token do not match.
 	 * 
 	 * @param consumerKey
-	 * @param accessToken
-	 * @return
+	 *            the consumer key that needs to be mapped to the generated pair
+	 * 
+	 * @param requestToken
+	 *            the request token for which the secret needs to be found
+	 * 
+	 * @return the secret if it maps for the given consumer key and request
+	 *         token, else <code>null</code>
 	 */
 	public String getSecret(String consumerKey, String requestToken);
 
