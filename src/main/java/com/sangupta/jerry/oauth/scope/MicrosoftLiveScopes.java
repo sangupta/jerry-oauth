@@ -4,7 +4,7 @@ package com.sangupta.jerry.oauth.scope;
  * Read more on Microsoft Live scopes here: http://msdn.microsoft.com/en-us/library/live/hh243646.aspx
  * 
  * @author sangupta
- *
+ * @since 1.0
  */
 public interface MicrosoftLiveScopes {
 	

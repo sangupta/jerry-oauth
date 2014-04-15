@@ -14,20 +14,21 @@ import com.sangupta.jerry.encoder.Base62Encoder;
 public class NonceUtils {
 	
 	/**
-	 * Return a UUID based nonce token that can be used
-	 * when sending to OAuth servers.
+	 * Return a UUID based nonce token that can be used when sending to OAuth
+	 * servers.
 	 * 
-	 * @return
+	 * @return a {@link UUID} based nonce
 	 */
 	public static String getUUIDNonce() {
 		return UUID.randomUUID().toString();
 	}
 
 	/**
-	 * Generates an encoded nonce that comprises of a UUID, the current
-	 * system time, and the time in nanoseconds.
+	 * Generates an encoded nonce that comprises of a UUID, the current system
+	 * time, and the time in nanoseconds.
 	 * 
-	 * @return
+	 * @return a {@link UUID}, timestamp and nanotime based nonce that is base62
+	 *         encoded
 	 */
 	public static String getNonce() {
 		UUID uuid = UUID.randomUUID();

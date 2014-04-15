@@ -269,10 +269,16 @@ public class OAuthUtils {
 	}
 	
 	/**
-	 * Extract all the query parameters from the URI
+	 * Extract all the query parameters from the URI.
 	 * 
 	 * @param uri
-	 * @return
+	 *            the {@link URI} from which the params need to be extracted
+	 * 
+	 * @return a {@link TreeMap} containing all query parameters. Never returns
+	 *         a <code>null</code>
+	 * 
+	 * @throws NullPointerException
+	 *             if {@link URI} presented is <code>null</code>
 	 */
 	public static TreeMap<String, String> extractURIParameters(URI uri) {
 		final TreeMap<String, String> params = new TreeMap<String, String>();
@@ -292,25 +298,36 @@ public class OAuthUtils {
 	}
 
 	/**
-	 * Return the base string ready to be included in signable-string. The difference
-	 * between this method and {@link #getSigningBaseURL(String)} is that the return
-	 * value will be percent-encoded, if needed.
+	 * Return the base string ready to be included in signable-string. The
+	 * difference between this method and {@link #getSigningBaseURL(String)} is
+	 * that the return value will be percent-encoded, if needed.
 	 * 
-	 * @param baseURL
-	 * @return
-	 * @throws URISyntaxException 
+	 * @param url
+	 *            the URL from which the signable base string needs to be
+	 *            constructed
+	 * 
+	 * @return the base string that can be signed
+	 * 
+	 * @throws URISyntaxException
+	 *             if the url is not in proper format
 	 */
 	public static String getSignableBase(String url) throws URISyntaxException {
 		return UriUtils.encodeURIComponent(getSigningBaseURL(url), true);
 	}
 	
 	/**
-	 * Return the base string ready to be included in signable-string. The difference
-	 * between this method and {@link #getSigningBaseURL(URI)} is that the return
-	 * value will be percent-encoded, if needed.
+	 * Return the base string ready to be included in signable-string. The
+	 * difference between this method and {@link #getSigningBaseURL(URI)} is
+	 * that the return value will be percent-encoded, if needed.
 	 * 
 	 * @param uri
-	 * @return
+	 *            the {@link URI} from which the signable base string is
+	 *            contructed
+	 * 
+	 * @return the base string that can be signed
+	 * 
+	 * @throws IllegalArgumentException
+	 *             is {@link URI} presented is <code>null</code>
 	 */
 	public static String getSignableBase(URI uri) {
 		return UriUtils.encodeURIComponent(getSigningBaseURL(uri), true);

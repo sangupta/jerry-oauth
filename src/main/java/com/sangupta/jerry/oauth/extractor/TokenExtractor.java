@@ -44,9 +44,13 @@ public interface TokenExtractor {
 	 * Extract the tokens from the given response and return them as a
 	 * {@link Map}.
 	 * 
-	 * @param webResponse
-	 * @return
+	 * @param response
+	 *            the {@link String} representation of the response received
+	 *            from server
+	 * 
+	 * @return a {@link Map} containing key-value pairs of all elements in the
+	 *         response
 	 */
-	public Map<String, String> extractTokens(String webResponse);
+	public Map<String, String> extractTokens(String response);
 
 }

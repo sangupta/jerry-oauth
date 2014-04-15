@@ -22,6 +22,7 @@
 package com.sangupta.jerry.oauth.scope;
 
 /**
+ * Linkedin scopes from https://developer.linkedin.com/documents/authentication#granting
  * 
  * @author sangupta
  * @since 1.0
@@ -38,6 +39,12 @@ public interface LinkedInScopes {
 	
 	public static final String CONTACT_INFO = "r_contactinfo";
 	
+	public static final String NETWORK_UPDATES = "rw_nus";
+	
+	public static final String COMPANY_PAGE_ADMIN = "rw_company_admin";
+	
 	public static final String GROUPS = "rw_groups";
+	
+	public static final String MESSAGES = "w_messages";
 	
 }

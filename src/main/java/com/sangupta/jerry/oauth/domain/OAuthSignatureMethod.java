@@ -55,9 +55,11 @@ public enum OAuthSignatureMethod {
 	/**
 	 * Constructor
 	 * 
-	 * @param oauthName the name of the signing method
+	 * @param oauthName
+	 *            the name of the signing method
 	 * 
-	 * @param algoName the algorithm's Java specific name 
+	 * @param algoName
+	 *            the algorithm's Java specific name
 	 */
 	private OAuthSignatureMethod(String oauthName, String algoName) {
 		this.oauthName = oauthName;
@@ -67,7 +69,7 @@ public enum OAuthSignatureMethod {
 	/**
 	 * Return the name of the signing method
 	 * 
-	 * @return
+	 * @return the common name of the signing method
 	 */
 	public String getOAuthName() {
 		return oauthName;
@@ -76,7 +78,7 @@ public enum OAuthSignatureMethod {
 	/**
 	 * Return the name of the algorithm for this signing method
 	 * 
-	 * @return
+	 * @return the name of the algorithm that can be used
 	 */
 	public String getAlgorithmName() {
 		return algorithmName;
