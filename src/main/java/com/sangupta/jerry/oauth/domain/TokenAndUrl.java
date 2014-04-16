@@ -22,6 +22,7 @@
 package com.sangupta.jerry.oauth.domain;
 
 
+
 /**
  * Value object that may contain a request token and the authentication
  * URL to which the user needs to be redirected to for OAuth workflows.
@@ -47,13 +48,35 @@ public class TokenAndUrl {
 	 * The redirect login URL that the client needs to use
 	 */
 	public transient final String loginRedirectURL;
-	
+
+	/**
+	 * Generate a new {@link TokenAndUrl} instance with <code>null</code> token
+	 * 
+	 * @param loginRedirectURL
+	 *            the generated login redirect URl
+	 * 
+	 * @param callbackURL
+	 *            the callback URL specified during generation of redirect URL
+	 */
 	public TokenAndUrl(String loginRedirectURL, String callbackURL) {
 		this.loginRedirectURL = loginRedirectURL;
 		this.callbackURL = callbackURL;
 		this.token = null;
 	}
 	
+	/**
+	 * Generate a new {@link TokenAndUrl} instance with <code>null</code> token
+	 * 
+	 * @param loginRedirectURL
+	 *            the generated login redirect URl
+	 * 
+	 * @param callbackURL
+	 *            the callback URL specified during generation of redirect URL
+	 * 
+	 * @param token
+	 *            the {@link KeySecretPair} token generated as part of
+	 *            initiation request
+	 */
 	public TokenAndUrl(String loginRedirectURL, String callbackURL, KeySecretPair token) {
 		this.loginRedirectURL = loginRedirectURL;
 		this.callbackURL = callbackURL;
