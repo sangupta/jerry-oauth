@@ -32,6 +32,8 @@ public interface FacebookScopes {
 	
 	// basic scopes
 	
+	public static final String BASIC_INFO = "basic_info";
+	
 	public static final String EMAIL = "email";
 	
 	// extended profile scopes
